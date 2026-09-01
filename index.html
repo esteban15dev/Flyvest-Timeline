@@ -1,0 +1,3103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flyvest — Centro de Comando del Proyecto</title>
+  <meta name="description" content="Resumen ejecutivo, arquitectura, plan financiero y tareas interactivas del proyecto Flyvest para el equipo de 4 desarrolladores de Amplify (Cesar, Angel, Mujica, Esteban) con guías paso a paso." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Flyvest" />
+  <meta name="application-name" content="Flyvest" />
+  <meta name="msapplication-TileColor" content="#0a0a0f" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --bg-elevated: #1e1e2a;
+      --bg-glass: rgba(22, 22, 31, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(99, 179, 237, 0.2);
+      --text-primary: #e8e8ed;
+      --text-secondary: #9a9ab0;
+      --text-muted: #5a5a72;
+      --accent-blue: #63b3ed;
+      --accent-purple: #805ad5;
+      --accent-teal: #38b2ac;
+      --accent-orange: #ed8936;
+      --accent-red: #fc8181;
+      --accent-green: #48bb78;
+      --accent-pink: #d53f8c;
+      --dev1-color: #63b3ed;
+      --dev2-color: #805ad5;
+      --dev3-color: #38b2ac;
+      --dev4-color: #ed8936;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; scroll-padding-top: 80px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+    ::selection { background: rgba(99,179,237,0.25); color: #fff; }
+
+    /* ===== AMBIENT GLOWS ===== */
+    .ambient-glow {
+      position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.04;
+      pointer-events: none; z-index: 0;
+    }
+    .glow-1 { top: -200px; left: -200px; width: 600px; height: 600px; background: var(--accent-blue); }
+    .glow-2 { bottom: -200px; right: -200px; width: 600px; height: 600px; background: var(--accent-purple); }
+
+    /* ===== NAVIGATION ===== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: rgba(10, 10, 15, 0.85);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: var(--transition-base);
+    }
+    .nav-inner {
+      max-width: 1300px; margin: 0 auto; padding: 0 1.5rem;
+      display: flex; align-items: center; height: 64px; gap: 1rem;
+    }
+    .nav-brand {
+      font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; white-space: nowrap; flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex; gap: 0.15rem; list-style: none;
+      overflow-x: auto; flex: 1; scrollbar-width: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none; font-size: 0.78rem;
+      font-weight: 500; padding: 0.4rem 0.7rem; border-radius: var(--radius-sm);
+      transition: var(--transition-fast); white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text-primary); background: rgba(255,255,255,0.05);
+    }
+    .nav-progress-bar {
+      position: absolute; bottom: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+      transition: width 0.3s ease;
+    }
+    .pwa-status-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.72rem; font-weight: 600; padding: 0.25rem 0.6rem;
+      border-radius: 20px; border: 1px solid var(--border-subtle);
+      background: var(--bg-card); color: var(--text-secondary);
+      transition: var(--transition-fast); user-select: none;
+    }
+    .pwa-status-badge.online .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green);
+    }
+    .pwa-status-badge.offline {
+      border-color: rgba(237,137,54,0.4); background: rgba(237,137,54,0.1);
+      color: var(--accent-orange);
+    }
+    .pwa-status-badge.offline .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange);
+    }
+    .nav-install-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm); border: 1px solid rgba(99,179,237,0.3);
+      background: linear-gradient(135deg, rgba(99,179,237,0.15), rgba(128,90,213,0.15));
+      color: var(--accent-blue); cursor: pointer; transition: var(--transition-fast);
+    }
+    .nav-install-btn:hover {
+      background: linear-gradient(135deg, rgba(99,179,237,0.3), rgba(128,90,213,0.3));
+      transform: translateY(-1px); box-shadow: var(--shadow-sm);
+    }
+    .task-controls-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; margin-bottom: 0.5rem;
+      padding: 0.5rem 0.8rem; background: var(--bg-card);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+    }
+    .task-action-btn {
+      font-size: 0.75rem; font-weight: 500; padding: 0.3rem 0.7rem;
+      border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated); color: var(--text-secondary);
+      cursor: pointer; transition: var(--transition-fast);
+    }
+    .task-action-btn:hover {
+      background: var(--bg-card-hover); color: var(--text-primary);
+      border-color: var(--border-accent);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding: 7rem 1.5rem 3rem; text-align: center;
+      background: radial-gradient(ellipse at center top, rgba(99,179,237,0.06) 0%, transparent 60%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem;
+      font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.2);
+      color: var(--accent-blue); margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900;
+      letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1rem;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple), var(--accent-pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { color: var(--text-secondary); font-size: 1.05rem; max-width: 700px; margin: 0 auto 2rem; }
+
+    /* ===== STATS ROW ===== */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem; max-width: 900px; margin: 0 auto 3rem; padding: 0 1.5rem;
+    }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1.2rem; text-align: center;
+      transition: var(--transition-base);
+    }
+    .stat-card:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+    .stat-value {
+      font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
+
+    /* ===== SECTION BASE ===== */
+    .section {
+      max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem;
+    }
+    .section-header {
+      margin-bottom: 2rem;
+    }
+    .section-tag {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent-blue); margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem;
+    }
+    .section-desc { color: var(--text-secondary); font-size: 0.95rem; max-width: 700px; }
+
+    /* ===== CARDS GRID ===== */
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .info-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: 1.5rem; transition: var(--transition-base);
+      position: relative; overflow: hidden;
+    }
+    .info-card:hover { border-color: var(--border-accent); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .info-card .card-icon {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 1rem;
+    }
+    .info-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .info-card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; }
+
+    /* ===== TEAM TABLE ===== */
+    .team-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem;
+    }
+    .dev-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: 1.5rem; transition: var(--transition-base);
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .dev-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .dev-card[data-dev="1"]::before { background: var(--dev1-color); }
+    .dev-card[data-dev="2"]::before { background: var(--dev2-color); }
+    .dev-card[data-dev="3"]::before { background: var(--dev3-color); }
+    .dev-card[data-dev="4"]::before { background: var(--dev4-color); }
+    .dev-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .dev-card .dev-emoji { font-size: 2rem; margin-bottom: 0.8rem; }
+    .dev-card .dev-name { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.2rem; color: #fff; }
+    .dev-card .dev-alias { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+    .dev-card[data-dev="1"] .dev-alias { color: var(--dev1-color); }
+    .dev-card[data-dev="2"] .dev-alias { color: var(--dev2-color); }
+    .dev-card[data-dev="3"] .dev-alias { color: var(--dev3-color); }
+    .dev-card[data-dev="4"] .dev-alias { color: var(--dev4-color); }
+    .dev-card .dev-role { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.8rem; line-height: 1.4; }
+    .dev-card .dev-tech {
+      display: flex; flex-wrap: wrap; gap: 0.3rem;
+    }
+    .dev-card .tech-tag {
+      font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 12px;
+      font-weight: 600; letter-spacing: 0.02em;
+    }
+    .dev-card[data-dev="1"] .tech-tag { background: rgba(99,179,237,0.12); color: var(--dev1-color); }
+    .dev-card[data-dev="2"] .tech-tag { background: rgba(128,90,213,0.12); color: var(--dev2-color); }
+    .dev-card[data-dev="3"] .tech-tag { background: rgba(56,178,172,0.12); color: var(--dev3-color); }
+    .dev-card[data-dev="4"] .tech-tag { background: rgba(237,137,54,0.12); color: var(--dev4-color); }
+
+    /* ===== PRICING TABLE ===== */
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.2rem;
+    }
+    .pricing-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: 1.8rem; text-align: center;
+      transition: var(--transition-base); position: relative;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 40px rgba(128,90,213,0.1);
+    }
+    .pricing-card.featured::before {
+      content: 'RECOMENDADO'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+      color: #fff; font-size: 0.6rem; font-weight: 700; padding: 0.2rem 0.8rem;
+      border-radius: 10px; letter-spacing: 0.08em;
+    }
+    .pricing-card:hover { transform: translateY(-4px); }
+    .pricing-card .plan-name {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--accent-blue); margin-bottom: 0.5rem;
+    }
+    .pricing-card .plan-price {
+      font-size: 2.2rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.3rem;
+    }
+    .pricing-card .plan-period { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .pricing-card .plan-features { list-style: none; text-align: left; }
+    .pricing-card .plan-features li {
+      font-size: 0.82rem; color: var(--text-secondary); padding: 0.35rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .pricing-card .plan-features li::before { content: '✓'; color: var(--accent-green); font-weight: 700; }
+
+    /* ===== HOSTING TABLE ===== */
+    .hosting-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem;
+    }
+    .hosting-table th {
+      text-align: left; padding: 0.8rem 1rem; font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-muted); border-bottom: 1px solid var(--border-subtle);
+    }
+    .hosting-table td {
+      padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+    .hosting-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .hosting-table .provider-name { color: var(--text-primary); font-weight: 600; }
+
+    /* ===== TASK BOARD ===== */
+    .task-filters {
+      display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .task-filter-btn {
+      padding: 0.45rem 1.1rem; border-radius: 20px; border: 1px solid var(--border-subtle);
+      background: transparent; color: var(--text-secondary); font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; transition: var(--transition-fast);
+      font-family: var(--font-sans);
+    }
+    .task-filter-btn:hover { border-color: var(--border-accent); color: var(--text-primary); }
+    .task-filter-btn.active { background: rgba(99,179,237,0.12); border-color: var(--accent-blue); color: var(--accent-blue); }
+    .task-filter-btn[data-dev="1"].active { background: rgba(99,179,237,0.12); border-color: var(--dev1-color); color: var(--dev1-color); }
+    .task-filter-btn[data-dev="2"].active { background: rgba(128,90,213,0.12); border-color: var(--dev2-color); color: var(--dev2-color); }
+    .task-filter-btn[data-dev="3"].active { background: rgba(56,178,172,0.12); border-color: var(--dev3-color); color: var(--dev3-color); }
+    .task-filter-btn[data-dev="4"].active { background: rgba(237,137,54,0.12); border-color: var(--dev4-color); color: var(--dev4-color); }
+
+    .task-progress {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1rem 1.2rem; margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .progress-bar-container {
+      flex: 1; min-width: 200px; height: 8px; background: rgba(255,255,255,0.05);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 4px; transition: width 0.5s ease;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    }
+    .progress-text { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+    .progress-count { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+    .task-phase {
+      margin-bottom: 1.5rem;
+    }
+    .phase-header {
+      display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem;
+      cursor: pointer; user-select: none;
+    }
+    .phase-header .phase-arrow {
+      font-size: 0.7rem; color: var(--text-muted); transition: transform 0.2s;
+    }
+    .phase-header.collapsed .phase-arrow { transform: rotate(-90deg); }
+    .phase-header .phase-title {
+      font-size: 0.95rem; font-weight: 700;
+    }
+    .phase-header .phase-badge {
+      font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 10px;
+      font-weight: 600;
+    }
+    .task-list { list-style: none; }
+    .task-list.hidden { display: none; }
+    .task-item {
+      display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.9rem;
+      border-radius: var(--radius-sm); transition: var(--transition-fast);
+      cursor: pointer; margin-bottom: 0.3rem; border: 1px solid transparent;
+      background: rgba(255,255,255,0.015);
+    }
+    .task-item:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(99, 179, 237, 0.15);
+      transform: translateX(3px);
+    }
+    .task-checkbox {
+      width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--text-muted);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      cursor: pointer; transition: var(--transition-fast);
+    }
+    .task-checkbox:hover {
+      border-color: var(--accent-blue);
+    }
+    .task-checkbox.checked {
+      border-color: var(--accent-green); background: var(--accent-green);
+    }
+    .task-checkbox.checked::after { content: '✓'; color: #000; font-size: 0.7rem; font-weight: 900; }
+    .task-item.completed .task-text { text-decoration: line-through; color: var(--text-muted); }
+    .task-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; flex: 1; }
+    .task-text strong { color: var(--text-primary); font-weight: 600; }
+    
+    .task-actions {
+      display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
+    }
+    .task-guide-btn {
+      font-size: 0.68rem; padding: 0.2rem 0.55rem; border-radius: 6px;
+      font-weight: 600; background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.2);
+      color: var(--accent-blue); display: flex; align-items: center; gap: 0.3rem;
+      transition: var(--transition-fast);
+    }
+    .task-item:hover .task-guide-btn {
+      background: rgba(99,179,237,0.2); border-color: var(--accent-blue);
+    }
+    .task-dev-tag {
+      font-size: 0.62rem; padding: 0.15rem 0.5rem; border-radius: 8px;
+      font-weight: 700; flex-shrink: 0; white-space: nowrap;
+    }
+    .task-dev-tag[data-dev="1"] { background: rgba(99,179,237,0.12); color: var(--dev1-color); }
+    .task-dev-tag[data-dev="2"] { background: rgba(128,90,213,0.12); color: var(--dev2-color); }
+    .task-dev-tag[data-dev="3"] { background: rgba(56,178,172,0.12); color: var(--dev3-color); }
+    .task-dev-tag[data-dev="4"] { background: rgba(237,137,54,0.12); color: var(--dev4-color); }
+
+    /* ===== MODAL DETAIL / PASO A PASO ===== */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5, 5, 10, 0.85); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.open {
+      opacity: 1; pointer-events: auto;
+    }
+    .modal-card {
+      background: var(--bg-card); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-xl); width: 100%; max-width: 780px; max-height: 88vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      transform: translateY(20px) scale(0.97); transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .modal-backdrop.open .modal-card {
+      transform: translateY(0) scale(1);
+    }
+    .modal-header {
+      padding: 1.5rem 1.8rem 1.2rem; border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    }
+    .modal-header-left {
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .modal-badges {
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .modal-badge {
+      font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 12px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .modal-title {
+      font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; line-height: 1.3;
+    }
+    .modal-close-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle);
+      color: var(--text-secondary); width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      font-size: 1rem; flex-shrink: 0; transition: var(--transition-fast);
+    }
+    .modal-close-btn:hover {
+      background: rgba(255,255,255,0.15); color: #fff; transform: rotate(90deg);
+    }
+    .modal-body {
+      padding: 1.8rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem;
+    }
+    .modal-section-title {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--accent-blue); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .modal-desc-box {
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-blue); border-radius: var(--radius-sm);
+      padding: 1rem 1.2rem; font-size: 0.9rem; color: var(--text-primary); line-height: 1.6;
+    }
+    .modal-steps-list {
+      list-style: none; display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .modal-step-item {
+      background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 0.9rem 1.1rem;
+      display: flex; gap: 0.9rem; align-items: flex-start;
+      font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;
+      transition: var(--transition-fast);
+    }
+    .modal-step-item:hover {
+      border-color: var(--border-accent); background: rgba(255,255,255,0.03); color: var(--text-primary);
+    }
+    .modal-step-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: #fff; font-size: 0.72rem; font-weight: 800; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+    }
+    .modal-step-text code {
+      font-family: var(--font-mono); font-size: 0.78rem; background: rgba(0,0,0,0.5);
+      padding: 0.15rem 0.45rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+      color: var(--accent-teal);
+    }
+    .modal-meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .modal-meta-card {
+      background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1rem;
+    }
+    .modal-meta-card h5 {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .modal-meta-card ul {
+      list-style: none; font-size: 0.8rem; font-family: var(--font-mono); color: var(--accent-blue);
+    }
+    .modal-meta-card ul li {
+      padding: 0.15rem 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .modal-footer {
+      padding: 1.2rem 1.8rem; border-top: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      background: rgba(10, 10, 15, 0.7);
+    }
+    .modal-btn {
+      padding: 0.55rem 1.2rem; border-radius: var(--radius-md); font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition-fast); display: inline-flex; align-items: center;
+      gap: 0.5rem; font-family: var(--font-sans); border: 1px solid transparent;
+    }
+    .modal-btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: #fff;
+    }
+    .modal-btn-primary:hover {
+      opacity: 0.9; transform: translateY(-1px);
+    }
+    .modal-btn-success {
+      background: rgba(72,187,120,0.15); border-color: var(--accent-green); color: var(--accent-green);
+    }
+    .modal-btn-success:hover {
+      background: var(--accent-green); color: #000; font-weight: 700;
+    }
+    .modal-btn-outline {
+      background: transparent; border-color: var(--border-subtle); color: var(--text-secondary);
+    }
+    .modal-btn-outline:hover {
+      background: rgba(255,255,255,0.05); color: var(--text-primary);
+    }
+
+    /* ===== ARCHITECTURE DIAGRAM ===== */
+    .arch-flow {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: 2rem; overflow-x: auto;
+    }
+    .arch-flow pre {
+      font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-blue);
+      line-height: 1.6; white-space: pre; min-width: 650px;
+    }
+
+    /* ===== TIMELINE VISUAL ===== */
+    .timeline-visual {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); padding: 1.5rem; overflow-x: auto;
+    }
+    .timeline-row {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;
+    }
+    .timeline-label {
+      width: 75px; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .timeline-bar-track {
+      flex: 1; display: flex; gap: 2px; min-width: 400px;
+    }
+    .timeline-week {
+      flex: 1; height: 32px; border-radius: 4px; display: flex;
+      align-items: center; justify-content: center; font-size: 0.6rem;
+      font-weight: 600; color: rgba(0,0,0,0.7); transition: var(--transition-fast);
+    }
+    .timeline-week:hover { transform: scaleY(1.15); }
+    .timeline-week.empty { background: rgba(255,255,255,0.03); }
+    .timeline-header .timeline-week {
+      background: transparent !important; color: var(--text-muted) !important;
+      font-size: 0.65rem; height: 20px;
+    }
+
+    /* ===== INVESTMENT ROADMAP ===== */
+    .invest-steps {
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .invest-step {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1.2rem; transition: var(--transition-base);
+    }
+    .invest-step:hover { border-color: var(--border-accent); }
+    .invest-step .step-number {
+      width: 32px; height: 32px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 0.8rem;
+      font-weight: 800; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: #fff;
+    }
+    .invest-step .step-content h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .invest-step .step-content p { font-size: 0.82rem; color: var(--text-secondary); }
+    .invest-step .step-price {
+      font-size: 0.75rem; font-weight: 700; color: var(--accent-green);
+      background: rgba(72,187,120,0.1); padding: 0.15rem 0.5rem;
+      border-radius: 8px; margin-top: 0.3rem; display: inline-block;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center; padding: 3rem 1.5rem; border-top: 1px solid var(--border-subtle);
+      color: var(--text-muted); font-size: 0.8rem;
+    }
+    .footer strong { color: var(--text-secondary); }
+
+    /* ===== FEATURE LIST ===== */
+    .feature-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;
+    }
+    .feature-item {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1.2rem; transition: var(--transition-base);
+    }
+    .feature-item:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+    .feature-item .feat-code {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-purple);
+      font-weight: 600; margin-bottom: 0.3rem;
+    }
+    .feature-item h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .feature-item p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .nav-inner { padding: 0 1rem; }
+      .nav-links a { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
+      .hero { padding: 6rem 1rem 2rem; }
+      .section { padding: 2.5rem 1rem; }
+      .modal-meta-grid { grid-template-columns: 1fr; }
+      .task-guide-btn span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="nav" id="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand" style="display: flex; align-items: center; gap: 0.45rem;">
+        <img src="favicon.svg" alt="Logo Flyvest" style="width: 22px; height: 22px; border-radius: 6px; display: inline-block; vertical-align: middle;" />
+        <span>⚡ Flyvest</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#vision">Visión</a></li>
+        <li><a href="#equipo">Equipo</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#arquitectura">Arquitectura</a></li>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#hosting">Hosting</a></li>
+        <li><a href="#inversion">Inversión</a></li>
+        <li><a href="#tareas">Tareas</a></li>
+      </ul>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0;">
+        <span id="pwaStatusBadge" class="pwa-status-badge online" title="Estado de conexión">
+          <span class="status-dot"></span> <span class="status-text">Online</span>
+        </span>
+        <button id="installPwaBtn" class="nav-install-btn" style="display: none;" onclick="triggerPwaInstall()">
+          ⬇ Instalar App
+        </button>
+      </div>
+    </div>
+    <div class="nav-progress-bar" id="navProgress" style="width: 0%"></div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="hero-badge">🚀 Centro de Comando del Proyecto</div>
+    <h1>Construyendo <span>Flyvest</span></h1>
+    <p>Plataforma SaaS de gestión de ventas a crédito, cobranza en ruta, control de caja y administración de carteras. Diseñada para dominar el mercado latinoamericano.</p>
+  </header>
+
+  <!-- ===== STATS ===== -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value">4</div>
+      <div class="stat-label">Desarrolladores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">8</div>
+      <div class="stat-label">Features</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">8</div>
+      <div class="stat-label">Semanas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">480h</div>
+      <div class="stat-label">Horas Est.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$72K</div>
+      <div class="stat-label">Valoración SaaS</div>
+    </div>
+  </div>
+
+  <!-- ===== VISIÓN ===== -->
+  <section class="section" id="vision">
+    <div class="section-header">
+      <div class="section-tag">01 — Visión General</div>
+      <h2 class="section-title">¿Qué es Flyvest?</h2>
+      <p class="section-desc">Una plataforma SaaS de nueva generación que supera tecnológicamente a soluciones legacy como Inveragil, solucionando problemas de caídas, fragmentación, interfaces obsoletas y pérdida de datos.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="card-icon" style="background: rgba(99,179,237,0.12)">📱</div>
+        <h3>Mobile-First Real</h3>
+        <p>89.8% de interacciones desde móvil. Diseño ergonómico para trabajo en campo con una sola mano. Operación completa en 2-3 toques.</p>
+      </div>
+      <div class="info-card">
+        <div class="card-icon" style="background: rgba(56,178,172,0.12)">📡</div>
+        <h3>Local-First & Offline</h3>
+        <p>El dispositivo es la fuente de verdad. SQLite/Isar local con sincronización CRDT hacia Supabase cuando hay conexión. Cero pérdida de datos.</p>
+      </div>
+      <div class="info-card">
+        <div class="card-icon" style="background: rgba(128,90,213,0.12)">🖨️</div>
+        <h3>Impresión Térmica Universal</h3>
+        <p>Motor ESC/POS para Bluetooth Classic, BLE, USB OTG y TCP/IP. Comprobantes de 58mm y 80mm con QR, sin depender de internet.</p>
+      </div>
+      <div class="info-card">
+        <div class="card-icon" style="background: rgba(237,137,54,0.12)">🤖</div>
+        <h3>IA Integrada (Gemini API)</h3>
+        <p>Chat de asistencia inteligente con Google AI Studio / Gemini API vía Supabase Edge Functions. Contexto autorizado del negocio.</p>
+      </div>
+      <div class="info-card">
+        <div class="card-icon" style="background: rgba(213,63,140,0.12)">🔒</div>
+        <h3>Continuar con Google (OAuth)</h3>
+        <p>Autenticación universal en 1 toque en móvil y web con Google OAuth. Multi-tenant con PostgreSQL Row Level Security (RLS).</p>
+      </div>
+      <div class="info-card">
+        <div class="card-icon" style="background: rgba(72,187,120,0.12)">💰</div>
+        <h3>$0 Costo de Entrada</h3>
+        <p>Cero costos de instalación para el cliente. Ventaja competitiva directa contra los $200-$500 de setup de la competencia.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EQUIPO ===== -->
+  <section class="section" id="equipo">
+    <div class="section-header">
+      <div class="section-tag">02 — Equipo de Desarrollo</div>
+      <h2 class="section-title">4 Desarrolladores, 4 Dominios</h2>
+      <p class="section-desc">División estratégica por capas funcionales para minimizar conflictos de Git y maximizar paralelismo.</p>
+    </div>
+    <div class="team-grid">
+      <div class="dev-card" data-dev="1">
+        <div class="dev-emoji">📱</div>
+        <div class="dev-name">Cesar</div>
+        <div class="dev-alias">Dev 1 — Mobile & Hardware Lead</div>
+        <div class="dev-role">Aplicación móvil offline-first, Google Sign-In, base de datos local y motor de impresión térmica ESC/POS.</div>
+        <div class="dev-tech">
+          <span class="tech-tag">Flutter</span>
+          <span class="tech-tag">Dart</span>
+          <span class="tech-tag">SQLite/Isar</span>
+          <span class="tech-tag">ESC/POS</span>
+          <span class="tech-tag">Google OAuth</span>
+        </div>
+      </div>
+      <div class="dev-card" data-dev="2">
+        <div class="dev-emoji">💻</div>
+        <div class="dev-name">Angel</div>
+        <div class="dev-alias">Dev 2 — Frontend Web & UX Lead</div>
+        <div class="dev-role">Plataforma web, Landing Page, /pricing, Dashboard de dueños, módulo Super-Admin y pasarela Lemon Squeezy.</div>
+        <div class="dev-tech">
+          <span class="tech-tag">Next.js 14/15</span>
+          <span class="tech-tag">Tailwind CSS</span>
+          <span class="tech-tag">Shadcn UI</span>
+          <span class="tech-tag">Lemon Squeezy</span>
+          <span class="tech-tag">Google OAuth</span>
+        </div>
+      </div>
+      <div class="dev-card" data-dev="3">
+        <div class="dev-emoji">🗄️</div>
+        <div class="dev-name">Mujica</div>
+        <div class="dev-alias">Dev 3 — Backend Core & DB Lead</div>
+        <div class="dev-role">Arquitectura relacional PostgreSQL, Row Level Security, microservicios NestJS, Edge Functions y triggers OAuth.</div>
+        <div class="dev-tech">
+          <span class="tech-tag">Supabase</span>
+          <span class="tech-tag">PostgreSQL (RLS)</span>
+          <span class="tech-tag">NestJS</span>
+          <span class="tech-tag">Google Cloud/AI</span>
+        </div>
+      </div>
+      <div class="dev-card" data-dev="4">
+        <div class="dev-emoji">⚙️</div>
+        <div class="dev-name">Esteban</div>
+        <div class="dev-alias">Dev 4 — DevOps, Concurrency & Workers</div>
+        <div class="dev-role">Microservicios Go de alta concurrencia, algoritmo TSP de rutas, colas Redis/BullMQ, Docker y CI/CD.</div>
+        <div class="dev-tech">
+          <span class="tech-tag">Go (Golang)</span>
+          <span class="tech-tag">Upstash Redis</span>
+          <span class="tech-tag">BullMQ</span>
+          <span class="tech-tag">Docker / CI/CD</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <div class="section-tag">03 — Features del Producto</div>
+      <h2 class="section-title">8 Features, 1 Plataforma</h2>
+      <p class="section-desc">Cada feature tiene su especificación completa con criterios de aceptación, plan de implementación y checklist de tareas.</p>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feat-code">001</div>
+        <h4>Auth & Multi-Tenant Isolation</h4>
+        <p>Google OAuth ("Continuar con Google"), Row Level Security (RLS) por tenant, RBAC con 4 roles, sesiones offline en Flutter.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">002</div>
+        <h4>Local-First Engine & CRDT Sync</h4>
+        <p>Operación 100% offline, UUIDs locales con Vector Clock, sincronización idempotente, log de eventos inmutable.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">003</div>
+        <h4>Core de Ventas, Préstamos y Cartera</h4>
+        <p>Créditos (interés fijo/francés), cobro rápido en 2 toques con feedback háptico, caja y arqueo diario.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">004</div>
+        <h4>Motor de Impresión Térmica ESC/POS</h4>
+        <p>Multi-protocolo (BT Classic, BLE, USB OTG, TCP/IP), formatos 58mm/80mm, QR dinámico, resiliencia de conexión.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">005</div>
+        <h4>Rutas de Cobro y Geolocalización</h4>
+        <p>Ordenamiento inteligente por GPS (TSP 2-Opt), geocercas de validación, navegación a Google Maps/Waze, monitoreo en vivo.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">006</div>
+        <h4>Panel Web de Administración</h4>
+        <p>Métricas en tiempo real, administración de cartera, exportación multi-formato (Excel, PDF, JSON), API REST documentada.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">007</div>
+        <h4>Super-Admin de Amplify</h4>
+        <p>Gestión interna de tenants, control de facturación Lemon Squeezy, Kill Switches, métricas globales de operación.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-code">008</div>
+        <h4>Monetización con Lemon Squeezy</h4>
+        <p>Planes escalonados (Starter/Pro/Enterprise), checkout embebido, webhooks → Supabase, feature gating por plan.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ARQUITECTURA ===== -->
+  <section class="section" id="arquitectura">
+    <div class="section-header">
+      <div class="section-tag">04 — Arquitectura del Sistema</div>
+      <h2 class="section-title">Flujo de Trabajo Local-First</h2>
+      <p class="section-desc">La clave: el dispositivo móvil es la fuente de verdad durante la operación en ruta. Las limitaciones de los hostings gratuitos se vuelven invisibles.</p>
+    </div>
+    <div class="arch-flow">
+      <pre>
+┌──────────────────────────────────────────────────────────────────────┐
+│  📱 CAPA DE CLIENTE (Operación en Ruta — 100% Offline)              │
+│                                                                      │
+│  Flutter App (Cesar) → SQLite/Isar (Local DB) → ESC/POS (BT/USB)    │
+│       │                                                              │
+│       └── Al detectar conexión → Sincronización CRDT ────────────────┤
+└──────────────────────────────────────────┬───────────────────────────┘
+                                           │
+                                           ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  ☁️  SUPABASE (BaaS Central — Mujica)                                │
+│                                                                      │
+│  PostgreSQL (RLS) ←→ Auth (Google OAuth) ←→ Edge Functions           │
+│       │                      │                │                      │
+│       │ Webhooks            │                └──→ Gemini API (IA)    │
+│       ▼                      ▼                                       │
+│  NestJS (Lógica Financiera)  Lemon Squeezy (Pagos)                  │
+│       │                                                              │
+│       └── BullMQ → Upstash Redis → Go Worker (Esteban) ──────────────┤
+│                                      │                               │
+│                                      └──→ Rutas (Feature 005)       │
+└──────────────────────────────────────────────────────────────────────┘
+                                           │
+                                           ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  🌐 FRONTEND WEB (Next.js en Vercel — Angel)                         │
+│                                                                      │
+│  Dashboard Dueños (006) ←→ Super-Admin Amplify (007)                 │
+│  Landing Page (/pricing) ←→ Lemon Squeezy Checkout (008)             │
+└──────────────────────────────────────────────────────────────────────┘</pre>
+    </div>
+  </section>
+
+  <!-- ===== TIMELINE ===== -->
+  <section class="section" id="timeline">
+    <div class="section-header">
+      <div class="section-tag">05 — Timeline de Ejecución</div>
+      <h2 class="section-title">Roadmap de 8 Semanas</h2>
+      <p class="section-desc">Distribución paralela del trabajo por desarrollador. Cada color representa un bloque de responsabilidad.</p>
+    </div>
+    <div class="timeline-visual">
+      <div class="timeline-row timeline-header">
+        <div class="timeline-label" style="color: var(--text-muted); font-size: 0.65rem;">Semana</div>
+        <div class="timeline-bar-track">
+          <div class="timeline-week">S1</div>
+          <div class="timeline-week">S2</div>
+          <div class="timeline-week">S3</div>
+          <div class="timeline-week">S4</div>
+          <div class="timeline-week">S5</div>
+          <div class="timeline-week">S6</div>
+          <div class="timeline-week">S7</div>
+          <div class="timeline-week">S8</div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-label" style="color: var(--dev1-color);">Cesar (Dev 1)</div>
+        <div class="timeline-bar-track">
+          <div class="timeline-week" style="background: rgba(99,179,237,0.25);" title="Google Auth + Setup Flutter">Auth</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.25);" title="Google Auth + Setup Flutter">Setup</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.45);" title="Offline-First + Ventas">Offline</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.45);" title="Offline-First + Ventas">Ventas</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.45);" title="Offline-First + Ventas">Abonos</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.45);" title="Offline-First + Ventas">CRDT</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.65);" title="Impresión + Sync + IA">Print</div>
+          <div class="timeline-week" style="background: rgba(99,179,237,0.65);" title="Impresión + Sync + IA">IA+Sync</div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-label" style="color: var(--dev2-color);">Angel (Dev 2)</div>
+        <div class="timeline-bar-track">
+          <div class="timeline-week" style="background: rgba(128,90,213,0.25);" title="Landing + Auth Web">Landing</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.25);" title="Landing + Auth Web">Auth</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.45);" title="Dashboard del Dueño">Dash</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.45);" title="Dashboard del Dueño">Reportes</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.45);" title="Dashboard del Dueño">Clientes</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.65);" title="Monetización + Super-Admin">Pricing</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.65);" title="Monetización + Super-Admin">Lemon</div>
+          <div class="timeline-week" style="background: rgba(128,90,213,0.65);" title="Monetización + Super-Admin">Admin</div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-label" style="color: var(--dev3-color);">Mujica (Dev 3)</div>
+        <div class="timeline-bar-track">
+          <div class="timeline-week" style="background: rgba(56,178,172,0.25);" title="Esquema DB + RLS">Schema</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.25);" title="Esquema DB + RLS">RLS</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.25);" title="Esquema DB + RLS">Triggers</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.45);" title="Webhooks + NestJS">Webhooks</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.45);" title="Webhooks + NestJS">NestJS</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.45);" title="Webhooks + NestJS">Reglas</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.65);" title="Event Store">Events</div>
+          <div class="timeline-week" style="background: rgba(56,178,172,0.65);" title="Event Store">Store</div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-label" style="color: var(--dev4-color);">Esteban (Dev 4)</div>
+        <div class="timeline-bar-track">
+          <div class="timeline-week" style="background: rgba(237,137,54,0.25);" title="Infra + CI/CD">Infra</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.25);" title="Infra + CI/CD">CI/CD</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.45);" title="Redis + BullMQ">Redis</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.45);" title="Redis + BullMQ">BullMQ</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.45);" title="Redis + BullMQ">Colas</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.65);" title="Go Worker + Rutas">Go</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.65);" title="Go Worker + Rutas">Rutas</div>
+          <div class="timeline-week" style="background: rgba(237,137,54,0.65);" title="Go Worker + Rutas">Optim</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="section" id="pricing">
+    <div class="section-header">
+      <div class="section-tag">06 — Plan Financiero</div>
+      <h2 class="section-title">Estrategia de Precios</h2>
+      <p class="section-desc">Modelo escalonado (Tiered Pricing) en USD. Con solo 2 clientes Pro (~$120 MRR) se cubre toda la infraestructura premium.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$25 <span style="font-size: 0.9rem; color: var(--text-muted);">- $35</span></div>
+        <div class="plan-period">USD / mes</div>
+        <ul class="plan-features">
+          <li>Hasta 2 cobradores en ruta</li>
+          <li>Dashboard básico</li>
+          <li>1 local / sucursal</li>
+          <li>Chat de IA con límite</li>
+          <li>$0 costo de instalación</li>
+        </ul>
+      </div>
+      <div class="pricing-card featured">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$49 <span style="font-size: 0.9rem; color: var(--text-muted);">- $69</span></div>
+        <div class="plan-period">USD / mes</div>
+        <ul class="plan-features">
+          <li>Hasta 5 cobradores en ruta</li>
+          <li>Geolocalización de rutas</li>
+          <li>Reportes avanzados</li>
+          <li>Roles granulares (RBAC)</li>
+          <li>Chat IA sin límite</li>
+          <li>Soporte por email</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price">$99 <span style="font-size: 0.9rem; color: var(--text-muted);">- $149+</span></div>
+        <div class="plan-period">USD / mes</div>
+        <ul class="plan-features">
+          <li>10+ cobradores ($10 extra c/u)</li>
+          <li>Multi-sucursal</li>
+          <li>Integraciones API completas</li>
+          <li>Soporte prioritario</li>
+          <li>Reportes personalizados</li>
+          <li>SLA garantizado</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 600px;">
+      <div class="info-card" style="text-align: center;">
+        <h3 style="color: var(--accent-green); font-size: 1.4rem;">$12K – $19K</h3>
+        <p style="font-size: 0.75rem;">Valoración por costo de desarrollo (480h × $25-40/hr)</p>
+      </div>
+      <div class="info-card" style="text-align: center;">
+        <h3 style="color: var(--accent-purple); font-size: 1.4rem;">~$72,000</h3>
+        <p style="font-size: 0.75rem;">Valoración SaaS (30 clientes × $50/mes × 4x ARR)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOSTING ===== -->
+  <section class="section" id="hosting">
+    <div class="section-header">
+      <div class="section-tag">07 — Infraestructura</div>
+      <h2 class="section-title">Matriz de Hosting (Free Tier)</h2>
+      <p class="section-desc">Gracias al enfoque Local-First, la carga sobre servidores se reduce ~85% vs. arquitectura web tradicional. Capacidad: 30-50 tenants, 200-300 cobradores, ~20K cobros/día.</p>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="hosting-table">
+        <thead>
+          <tr>
+            <th>Componente</th>
+            <th>Proveedor</th>
+            <th>Plan Gratuito</th>
+            <th>Responsable</th>
+            <th>Fricción Principal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="provider-name">BaaS / BD / Auth</span></td>
+            <td>Supabase</td>
+            <td>500 MB BD, 50K MAU</td>
+            <td><strong>Mujica</strong></td>
+            <td>Pausa tras 7 días inactivo</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">API Core (NestJS)</span></td>
+            <td>Koyeb / Fly.io</td>
+            <td>1 instancia free</td>
+            <td><strong>Mujica</strong></td>
+            <td>Cold Start tras 15 min</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">Worker (Go)</span></td>
+            <td>Render</td>
+            <td>Web Service Free</td>
+            <td><strong>Esteban</strong></td>
+            <td>Cold Start 15-30s</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">Colas & Cache</span></td>
+            <td>Upstash Redis</td>
+            <td>10K cmd/día, 256 MB</td>
+            <td><strong>Esteban</strong></td>
+            <td>TTLs agresivos necesarios</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">Web Admin</span></td>
+            <td>Vercel</td>
+            <td>100 GB BW, Plan Hobby</td>
+            <td><strong>Angel</strong></td>
+            <td>Ejecución max 10s/función</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">Pasarela SaaS</span></td>
+            <td>Lemon Squeezy</td>
+            <td>$0 fijo</td>
+            <td><strong>Angel</strong></td>
+            <td>5% + $0.50 por transacción</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">Chat IA</span></td>
+            <td>Google AI Studio</td>
+            <td>Free Tier (Gemini)</td>
+            <td><strong>Cesar / Mujica</strong></td>
+            <td>Rate Limiting (RPM)</td>
+          </tr>
+          <tr>
+            <td><span class="provider-name">CI/CD Móvil</span></td>
+            <td>GitHub Actions</td>
+            <td>2,000 min/mes</td>
+            <td><strong>Esteban</strong></td>
+            <td>Suficiente para dev/testing</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== INVERSIÓN ===== -->
+  <section class="section" id="inversion">
+    <div class="section-header">
+      <div class="section-tag">08 — Hoja de Ruta de Inversión</div>
+      <h2 class="section-title">Escalamiento Progresivo</h2>
+      <p class="section-desc">Al conseguir los primeros 3-5 clientes de pago, los ingresos se reinvierten inmediatamente en infraestructura en este orden.</p>
+    </div>
+    <div class="invest-steps">
+      <div class="invest-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Supabase Pro</h4>
+          <p>Elimina la pausa de 7 días, sube la BD a 8 GB con backups automáticos diarios y elimina límites de conexiones.</p>
+          <span class="step-price">$25/mes</span>
+        </div>
+      </div>
+      <div class="invest-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Servidores Always-On (NestJS + Go)</h4>
+          <p>Elimina por completo los Cold Starts. Las peticiones web y sincronizaciones responden de forma instantánea.</p>
+          <span class="step-price">$7 – $14/mes c/u</span>
+        </div>
+      </div>
+      <div class="invest-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Upstash Redis Pay-As-You-Go</h4>
+          <p>Garantiza que la cola de mensajes entre NestJS y Go nunca rechace eventos por exceso de comandos diarios.</p>
+          <span class="step-price">~$10/mes</span>
+        </div>
+      </div>
+      <div class="invest-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Apple Developer Account</h4>
+          <p>Permite publicar la app de cobro directamente en la App Store para clientes con dispositivos iOS.</p>
+          <span class="step-price">$99/año</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TAREAS INTERACTIVAS ===== -->
+  <section class="section" id="tareas">
+    <div class="section-header">
+      <div class="section-tag">09 — Task Board Interactivo</div>
+      <h2 class="section-title">Tareas & Guías Paso a Paso por Desarrollador</h2>
+      <p class="section-desc">Haz clic sobre cualquier tarea para abrir su <strong>descripción técnica completa, archivos a modificar y guía paso a paso</strong>. Puedes marcarla como completada desde la lista o desde el visor interactivo.</p>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="task-filters">
+      <button class="task-filter-btn active" data-filter="all">Todos (General)</button>
+      <button class="task-filter-btn" data-dev="1" data-filter="1">📱 Cesar (Dev 1 — Mobile)</button>
+      <button class="task-filter-btn" data-dev="2" data-filter="2">💻 Angel (Dev 2 — Web)</button>
+      <button class="task-filter-btn" data-dev="3" data-filter="3">🗄️ Mujica (Dev 3 — Backend)</button>
+      <button class="task-filter-btn" data-dev="4" data-filter="4">⚙️ Esteban (Dev 4 — DevOps)</button>
+    </div>
+
+    <!-- TASK CONTROLS & CACHE STATUS BAR -->
+    <div class="task-controls-bar">
+      <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+        <span>💾</span> <span id="taskCacheStatus">Progreso sincronizado en caché local y offline</span>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="task-action-btn" onclick="TaskStore.resetAll()" title="Reiniciar todas las tareas completadas">
+          🔄 Reiniciar Progreso
+        </button>
+      </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="task-progress">
+      <span class="progress-text" id="progressPercent">0%</span>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+      </div>
+      <span class="progress-count" id="progressCount">0 / 0 tareas</span>
+    </div>
+
+    <!-- TASK LIST CONTAINER -->
+    <div id="taskContainer"></div>
+  </section>
+
+  <!-- ===== MODAL DETALLE DE TAREA ===== -->
+  <div class="modal-backdrop" id="taskModalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="modal-card" id="taskModalCard">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-badges">
+            <span class="modal-badge" id="modalFeatureBadge" style="background: rgba(128,90,213,0.15); color: var(--accent-purple);">Feature 001</span>
+            <span class="modal-badge" id="modalDevBadge" style="background: rgba(99,179,237,0.15); color: var(--dev1-color);">Cesar (Dev 1)</span>
+            <span class="modal-badge" id="modalStatusBadge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">⏳ Pendiente</span>
+          </div>
+          <h3 class="modal-title" id="modalTaskTitle">Título de la Tarea</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeTaskModal()" title="Cerrar (Esc)">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- DESCRIPCIÓN -->
+        <div>
+          <div class="modal-section-title">📋 Descripción & Contexto Técnico</div>
+          <div class="modal-desc-box" id="modalTaskDesc">
+            Descripción detallada de la tarea...
+          </div>
+        </div>
+
+        <!-- PASO A PASO -->
+        <div>
+          <div class="modal-section-title">🛠️ Guía de Implementación Paso a Paso</div>
+          <ul class="modal-steps-list" id="modalStepsList">
+            <!-- Steps injected by JS -->
+          </ul>
+        </div>
+
+        <!-- METADATOS Y ARCHIVOS -->
+        <div class="modal-meta-grid">
+          <div class="modal-meta-card">
+            <h5>📁 Archivos & Rutas Involucradas</h5>
+            <ul id="modalFilesList">
+              <!-- Files injected by JS -->
+            </ul>
+          </div>
+          <div class="modal-meta-card">
+            <h5>🎯 Entregable Esperado</h5>
+            <p id="modalDeliverable" style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-outline" onclick="copyTaskSteps()">
+          📋 Copiar Guía Paso a Paso
+        </button>
+        <div style="display: flex; gap: 0.6rem;">
+          <button class="modal-btn modal-btn-outline" onclick="closeTaskModal()">
+            Cerrar
+          </button>
+          <button class="modal-btn modal-btn-success" id="modalToggleBtn" onclick="toggleTaskFromModal()">
+            ✓ Marcar como Completada
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p>⚡ <strong>Flyvest</strong> — Centro de Comando del Proyecto · Desarrollado por <strong>Amplify</strong> (Cesar, Angel, Mujica, Esteban) · 2026</p>
+    <p style="margin-top: 0.5rem;">Desarrollado con pasión para dominar el mercado latinoamericano de cobranza en ruta.</p>
+  </footer>
+
+  <script>
+    // ===== TASK DATA =====
+    const TASKS = [
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Inicializar proyecto Flutter con arquitectura limpia (Clean Architecture / Feature-first)",
+    "desc": "Estructuración del proyecto base en Flutter multiplataforma (Android e iOS) a cargo de Cesar, aplicando Clean Architecture y organización Feature-First para garantizar escalabilidad y soporte offline-first.",
+    "steps": [
+      "Ejecutar el comando de creación de proyecto: `flutter create --org com.amplify.flyvest --platforms android,ios flyvest_mobile`.",
+      "Configurar `pubspec.yaml` con librerías core: `flutter_bloc` o `riverpod`, `fpdart` (programación funcional), `get_it` (inyección de dependencias), `uuid`, `connectivity_plus` y `google_fonts`.",
+      "Definir el árbol de directorios `lib/core/` (constants, errors, network, theme, utils) y `lib/features/` (auth, sync, loans, printing, routes).",
+      "Configurar `analysis_options.yaml` con reglas estrictas de linter (`flutter_lints` y `pedantic_mono`).",
+      "Configurar Flavors para separar entornos de `development` y `production` con sus respectivos IDs de paquete.",
+      "Validar compilación exitosa tanto en emulador Android como en simulador iOS."
+    ],
+    "files": [
+      "flyvest_mobile/pubspec.yaml",
+      "lib/core/",
+      "lib/main.dart",
+      "analysis_options.yaml"
+    ],
+    "deliverable": "Proyecto Flutter base compilable con arquitectura Feature-First y gestión de dependencias lista."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Configurar integración con Supabase Auth para Google OAuth ('Continuar con Google') y login por correo",
+    "desc": "Implementar el flujo de autenticación del cobrador en la app móvil mediante Supabase Auth con soporte de 'Continuar con Google' (Google OAuth / Google Cloud Console) y credenciales de correo, con retención segura de sesión offline.",
+    "steps": [
+      "Añadir los paquetes `supabase_flutter: ^2.x`, `google_sign_in: ^6.x` y `flutter_secure_storage` en `pubspec.yaml`.",
+      "Configurar las credenciales de Google OAuth (Client ID Web y Android/iOS) obtenidas de Google Cloud Console / Google AI Studio.",
+      "Inicializar Supabase en `main.dart` con la URL y anonKey: `await Supabase.initialize(url: ..., anonKey: ...)`.",
+      "Configurar Deep Linking en `android/app/src/main/AndroidManifest.xml` (intent-filter `io.supabase.flyvest://login-callback`) e iOS `Info.plist` (CFBundleURLSchemes).",
+      "Implementar botón táctil de 'Continuar con Google' que ejecute el flujo nativo de Google Sign-In e intercambie el `idToken` con Supabase.",
+      "Guardar la sesión de forma segura en `FlutterSecureStorage` para permitir inicio de jornada offline sin requerir conexión permanente."
+    ],
+    "files": [
+      "lib/features/auth/data/repositories/auth_repository_impl.dart",
+      "lib/features/auth/presentation/screens/login_screen.dart",
+      "android/app/src/main/AndroidManifest.xml"
+    ],
+    "deliverable": "Flujo de login 'Continuar con Google' nativo y funcional en móvil con persistencia offline."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Configurar proyecto Next.js con App Router + Tailwind CSS + Shadcn UI",
+    "desc": "Inicialización del frontend web moderno a cargo de Angel, utilizando Next.js (App Router), Tailwind CSS y Shadcn UI para la landing page, el panel de dueños y el módulo de administración.",
+    "steps": [
+      "Crear la app ejecutando `npx create-next-app@latest flyvest-web --typescript --tailwind --eslint --app --src-dir`.",
+      "Inicializar Shadcn UI: `npx shadcn-ui@latest init` (configuración: New York, Slate/Zinc, CSS variables habilitadas).",
+      "Instalar componentes básicos de Shadcn: `npx shadcn-ui@latest add button card dialog dropdown-menu input table badge sheet avatar separator tabs toast`.",
+      "Configurar tipografía `Inter` y `JetBrains Mono` con `next/font/google` en `app/layout.tsx`.",
+      "Estructurar carpetas del App Router: `app/(marketing)/`, `app/(auth)/`, `app/(dashboard)/`, `app/(super-admin)/`, `components/ui/`, `lib/utils.ts`.",
+      "Configurar variables de entorno `.env.local` con las credenciales de Supabase y Lemon Squeezy."
+    ],
+    "files": [
+      "flyvest-web/package.json",
+      "app/layout.tsx",
+      "tailwind.config.ts",
+      "components/ui/"
+    ],
+    "deliverable": "Frontend Next.js configurado con diseño base dark-mode y sistema de diseño Shadcn UI listo."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "006",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Diseñar y maquetar Landing Page y página de precios (/pricing)",
+    "desc": "Construir la cara pública de Flyvest con un diseño de alta calidad a cargo de Angel, resaltando la propuesta de valor ($0 instalación vs. $200-$500 de sistemas tradicionales) y tabla comparativa de los planes Starter, Pro y Enterprise.",
+    "steps": [
+      "Crear página principal `app/(marketing)/page.tsx` con secciones: Hero dinámico, comparación vs Inveragil ($0 setup, offline-first), características clave (Local-First, Impresión Bluetooth, IA) y llamadas a la acción.",
+      "Crear ruta `app/(marketing)/pricing/page.tsx` con las tarjetas de precios: Starter ($25-$35/mes), Pro ($49-$69/mes) y Enterprise ($99-$149+/mes).",
+      "Implementar toggle interactivo Mensual / Anual con badge de descuento ('Ahorra 20%').",
+      "Añadir micro-animaciones en tarjetas al hacer hover utilizando CSS / Framer Motion.",
+      "Conectar los botones 'Comenzar Ahora' con el botón de Google OAuth o checkout de Lemon Squeezy.",
+      "Optimizar metadatos SEO (`generateMetadata`) y OpenGraph tags para indexación en buscadores."
+    ],
+    "files": [
+      "app/(marketing)/page.tsx",
+      "app/(marketing)/pricing/page.tsx",
+      "components/marketing/pricing-cards.tsx"
+    ],
+    "deliverable": "Página web de aterrizaje y catálogo de precios responsiva, atractiva y optimizada para conversión."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Implementar sistema de autenticación web con botón 'Continuar con Google' y credenciales",
+    "desc": "Construcción de las pantallas de Login y Registro para los administradores de empresa a cargo de Angel, integradas con `@supabase/ssr` y destacando el botón 'Continuar con Google' para onboarding instantáneo.",
+    "steps": [
+      "Instalar y configurar `@supabase/ssr` para manejo seguro de cookies en Server Components y Route Handlers.",
+      "Crear `middleware.ts` para proteger las rutas `/dashboard/*` y `/admin/super/*`, redirigiendo usuarios no autenticados a `/login`.",
+      "Diseñar componente visual `GoogleSignInButton` con el logo oficial de Google y texto 'Continuar con Google'.",
+      "Conectar el botón de Google para disparar `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: ... } })`.",
+      "Diseñar formulario alternativo con validación de `react-hook-form` y `zod`.",
+      "Manejar redirección fluida al `/dashboard` tras autenticación exitosa."
+    ],
+    "files": [
+      "app/(auth)/login/page.tsx",
+      "app/(auth)/register/page.tsx",
+      "components/auth/google-sign-in-btn.tsx",
+      "middleware.ts"
+    ],
+    "deliverable": "Autenticación web con Google OAuth de 1 clic y fallback de credenciales."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Diseñar esquema relacional PostgreSQL (tenants, users, clients, loans, events)",
+    "desc": "Diseño de la arquitectura de datos relacionales en PostgreSQL a cargo de Mujica, soportando aislamiento multi-tenant estricto, gestión de créditos, trazabilidad inmutable y vinculación con Google Auth.",
+    "steps": [
+      "Modelar tabla `tenants` (id UUID PK, name, slug, plan_tier ENUM, subscription_status ENUM, kill_switch_active BOOLEAN, lemon_customer_id, created_at).",
+      "Modelar tabla `users` (id UUID PK, tenant_id UUID FK, auth_user_id UUID FK a auth.users, role ENUM: SUPER_ADMIN, COMPANY_ADMIN, SUPERVISOR, COLLECTOR, name, email, phone, is_active).",
+      "Modelar tabla `clients` (id UUID PK, tenant_id UUID FK, name, document_id, phone, address, lat DOUBLE, lng DOUBLE, route_order INT, is_active).",
+      "Modelar tabla `loans` (id UUID PK, tenant_id UUID FK, client_id UUID FK, collector_id UUID FK, amount NUMERIC, total_amount NUMERIC, interest_rate NUMERIC, interest_type ENUM, installments_count INT, installment_amount NUMERIC, frequency ENUM, status ENUM, start_date DATE).",
+      "Modelar tablas `payments` y `event_store` para registro inmutable de transacciones financieras.",
+      "Validar índices en `tenant_id`, `client_id`, `collector_id` y `created_at` para optimizar consultas."
+    ],
+    "files": [
+      "supabase/migrations/20260101_initial_schema.sql",
+      "docs/database-diagram.png"
+    ],
+    "deliverable": "Diagrama Entidad-Relación y script DDL completo del esquema relacional PostgreSQL."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Crear migración SQL base con tabla tenants y users",
+    "desc": "Implementar y ejecutar la migración inicial en Supabase a cargo de Mujica, habilitando extensiones criptográficas y tipos de datos personalizados.",
+    "steps": [
+      "Configurar Supabase CLI en el proyecto con `supabase init`.",
+      "Crear archivo de migración `supabase/migrations/20260101000000_core_schema.sql`.",
+      "Declarar extensiones `CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";` y `CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";`.",
+      "Definir ENUMs para roles (`user_role`), estados de préstamo (`loan_status`), tipos de interés (`interest_type`) y estados de suscripción (`subscription_status`).",
+      "Crear funciones y triggers para actualización automática de la columna `updated_at` en todas las tablas.",
+      "Aplicar la migración localmente con `supabase db reset` y verificar que las tablas e índices se creen limpiamente."
+    ],
+    "files": [
+      "supabase/migrations/20260101000000_core_schema.sql",
+      "supabase/config.toml"
+    ],
+    "deliverable": "Migración inicial ejecutada correctamente en la base de datos PostgreSQL de Supabase."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Habilitar Row Level Security y escribir políticas RLS por tenant_id",
+    "desc": "Configurar las políticas de Row Level Security (RLS) en todas las tablas de datos para garantizar aislamiento total e inviolable entre empresas (tenants).",
+    "steps": [
+      "Habilitar RLS en cada tabla: `ALTER TABLE tenants ENABLE ROW LEVEL SECURITY; ALTER TABLE users ENABLE ROW LEVEL SECURITY; ALTER TABLE clients ENABLE ROW LEVEL SECURITY; ...`",
+      "Crear función helper segura `get_auth_tenant_id()` que consulta el `tenant_id` del usuario autenticado en la tabla `users` o JWT claims.",
+      "Crear política de lectura/escritura para `clients`: `CREATE POLICY tenant_isolation_clients ON clients FOR ALL USING (tenant_id = get_auth_tenant_id()) WITH CHECK (tenant_id = get_auth_tenant_id());`.",
+      "Replicar políticas análogas para `loans`, `payments`, `routes` y `cash_boxes`.",
+      "Crear política especial de Bypass para `SUPER_ADMIN` o Service Role en consultas analíticas globales.",
+      "Ejecutar tests automatizados insertando datos con 2 usuarios de diferentes tenants y comprobar que ninguna consulta retorna datos ajenos."
+    ],
+    "files": [
+      "supabase/migrations/20260102000000_rls_policies.sql",
+      "supabase/tests/rls_test.sql"
+    ],
+    "deliverable": "Aislamiento multi-tenant validado mediante políticas RLS estrictas y sin fugas de datos."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Escribir triggers de Google OAuth y sincronizar perfiles de usuario",
+    "desc": "Automatizar la creación del registro en `public.users` cada vez que un usuario ingrese con 'Continuar con Google' (Google OAuth), extrayendo nombre, avatar y vinculándolo al tenant.",
+    "steps": [
+      "Escribir función PL/pgSQL `public.handle_new_auth_user()` con `SECURITY DEFINER`.",
+      "Extraer `raw_user_meta_data` (nombre completo de Google, email, picture/avatar) del nuevo registro en `auth.users`.",
+      "Asignar o crear el `tenant_id` correspondiente y rol por defecto (`COMPANY_ADMIN` para registros nuevos de empresa, o el rol asignado por invitación).",
+      "Vincular la función con el trigger `CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_auth_user();`.",
+      "Configurar en Supabase Auth las credenciales de Google OAuth Client ID y Client Secret de Google Cloud / Google AI Studio.",
+      "Probar el flujo con cuentas de Google reales y verificar que el usuario quede creado en `public.users` al instante."
+    ],
+    "files": [
+      "supabase/migrations/20260103000000_auth_triggers.sql"
+    ],
+    "deliverable": "Trigger de base de datos que sincroniza automáticamente las cuentas de Google con los perfiles de Flyvest."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Definir contratos de API (OpenAPI/Swagger) para consumo de frontends",
+    "desc": "Establecer la especificación formal de todas las estructuras JSON de entrada/salida (DTOs) antes de que Cesar (Móvil) y Angel (Web) comiencen la integración de datos.",
+    "steps": [
+      "Crear documento OpenAPI 3.0 (`docs/openapi.yaml`) detallando todos los endpoints previstos.",
+      "Definir esquemas de datos: `TenantDto`, `UserDto`, `ClientDto`, `CreateLoanDto`, `LoanDetailDto`, `PaymentPayloadDto`, `SyncBatchDto`.",
+      "Especificar cabeceras obligatorias (`Authorization: Bearer <JWT>`, `X-Tenant-ID: <UUID>`) y códigos de error estándar (400 Bad Request, 401 Unauthorized, 403 Forbidden, 409 Conflict).",
+      "Configurar Swagger UI local en el backend NestJS para visualización y prueba interactiva de endpoints.",
+      "Compartir los modelos de datos generados con Cesar (modelos Dart) y Angel (interfaces TypeScript)."
+    ],
+    "files": [
+      "docs/openapi.yaml",
+      "services/core/src/main.ts",
+      "packages/shared-types/"
+    ],
+    "deliverable": "Contrato OpenAPI 3.0 publicado y validado por todo el equipo para trabajo desacoplado."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Configurar repositorios en GitHub con estructura de monorepo",
+    "desc": "Organizar el repositorio del proyecto en GitHub a cargo de Esteban, asegurando una estructura clara, protección de ramas y plantillas de trabajo para los 4 desarrolladores.",
+    "steps": [
+      "Estructurar directorios del monorepo: `apps/mobile/` (Cesar), `apps/web/` (Angel), `services/core/` (Mujica), `services/worker/` (Esteban), `supabase/` y `docs/`.",
+      "Configurar `.gitignore` exhaustivo que excluya `.env`, `node_modules/`, `.dart_tool/`, `build/`, binarios de Go y archivos temporales de IDE.",
+      "Configurar reglas de protección de rama en `main`: requerir Pull Request y al menos 1 aprobación previa a merge.",
+      "Crear `.github/PULL_REQUEST_TEMPLATE.md` con checklist de calidad y referencia al feature spec.",
+      "Definir la convención de commits en español (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`)."
+    ],
+    "files": [
+      ".gitignore",
+      ".github/PULL_REQUEST_TEMPLATE.md",
+      "README.md"
+    ],
+    "deliverable": "Repositorio GitHub configurado con control de calidad y estructura monorepo limpia."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Crear workflows de GitHub Actions para CI/CD",
+    "desc": "Configurar pipelines de integración continua para probar y validar automáticamente el código en cada Pull Request, optimizando los 2,000 minutos mensuales gratuitos de GitHub.",
+    "steps": [
+      "Crear `.github/workflows/web-ci.yml`: ejecuta `npm run lint`, `npm run type-check` y `npm run build` para la app Next.js de Angel.",
+      "Crear `.github/workflows/mobile-ci.yml`: ejecuta `flutter analyze`, `flutter test` y compilación de prueba del APK para la app de Cesar.",
+      "Crear `.github/workflows/backend-ci.yml`: ejecuta tests unitarios de NestJS (Mujica) y tests de Go (Esteban).",
+      "Configurar acciones de caché (`actions/cache@v3`) para dependencias de Node, Gradle y Go modules, reduciendo tiempos de CI a < 2 minutos.",
+      "Probar ejecución de los workflows en un PR de prueba y verificar paso exitoso."
+    ],
+    "files": [
+      ".github/workflows/web-ci.yml",
+      ".github/workflows/mobile-ci.yml",
+      ".github/workflows/backend-ci.yml"
+    ],
+    "deliverable": "Workflows de CI/CD automáticos, rápidos y eficientes dentro del Free Tier de GitHub."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Configurar entorno local con docker-compose (PostgreSQL + Redis)",
+    "desc": "Proveer a Cesar, Angel, Mujica y Esteban de un entorno de infraestructura local idéntico y reproducible mediante contenedores Docker con un solo comando.",
+    "steps": [
+      "Crear `docker-compose.yml` con servicio `postgres` (versión 16-alpine con volumen persistente y puerto 5432).",
+      "Añadir servicio `redis` (versión 7-alpine con persistencia appendonly y puerto 6379).",
+      "Añadir servicio opcional `mailpit` (servidor SMTP simulado en puerto 1025 y panel web en puerto 8025) para depurar emails.",
+      "Crear archivo `.env.example` con variables de entorno locales preconfiguradas.",
+      "Crear script de arranque `scripts/dev-up.sh` (Linux/Mac) y `scripts/dev-up.ps1` (Windows).",
+      "Validar que `docker-compose up -d` inicie todos los servicios sin conflictos de puertos."
+    ],
+    "files": [
+      "docker-compose.yml",
+      ".env.example",
+      "scripts/dev-up.ps1"
+    ],
+    "deliverable": "Entorno Docker local listo para levantar base de datos y colas con un único comando."
+  },
+  {
+    "phase": "Fase 1 — Fundación & Multi-Tenancy (Sem 1-3)",
+    "feature": "001",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Provisionar cuentas gratuitas (Supabase, Vercel, Render, Upstash Redis)",
+    "desc": "Crear y vincular las cuentas de los proveedores cloud en sus planes gratuitos para desplegar entornos de staging e integración continua.",
+    "steps": [
+      "Crear organización y proyecto en Supabase (Plan Free: 500 MB BD, 50k MAU). Obtener URL y API Keys (anon y service_role).",
+      "Vincular el repositorio en Vercel (Plan Hobby: 100 GB ancho de banda) apuntando al directorio `apps/web/`.",
+      "Crear instancia Web Service en Render para el worker de Go (Plan Free).",
+      "Crear base de datos Redis en Upstash (Plan Free: 10,000 comandos/día, 256 MB). Obtener URL de conexión Redis segura (`rediss://...`).",
+      "Configurar los secrets correspondientes en GitHub Settings > Secrets and variables > Actions.",
+      "Documentar la matriz de endpoints y credenciales no sensibles en el README del proyecto."
+    ],
+    "files": [
+      ".env.production.example",
+      "docs/infrastructure-setup.md"
+    ],
+    "deliverable": "Infraestructura cloud gratuita provisionada, interconectada y lista para staging."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Definir esquemas de tablas SQLite/Isar para clientes, contratos y pagos",
+    "desc": "Modelar la base de datos embebida en el dispositivo móvil a cargo de Cesar para almacenar localmente toda la información operativa del cobrador de forma autónoma sin internet.",
+    "steps": [
+      "Instalar `drift` / `isar` y sus generadores de código (`build_runner`) en el proyecto Flutter.",
+      "Definir tabla local `LocalClients` (id, name, documentId, phone, address, lat, lng, routeOrder, isSynced).",
+      "Definir tabla local `LocalLoans` (id, clientId, amount, totalAmount, installmentAmount, installmentsPaid, balance, status, frequency).",
+      "Definir tabla local `LocalPayments` (id UUID, loanId, collectorId, amountPaid, paymentDate, notes, vectorClock, isSynced).",
+      "Definir tabla local `LocalSyncQueue` (id, eventType, payloadJson, createdAt, status).",
+      "Ejecutar `dart run build_runner build` y validar la creación de clases DAOs y repositorios locales."
+    ],
+    "files": [
+      "lib/core/database/app_database.dart",
+      "lib/features/sync/data/models/local_tables.dart"
+    ],
+    "deliverable": "Base de datos local en Flutter lista para persistir cartera y transacciones offline."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Implementar repositorio local con soporte de transacciones atómicas",
+    "desc": "Desarrollar la capa de acceso a datos que garantice consistencia transaccional (ACID local) para que un cobro descuente el saldo del préstamo y encole el evento de sincronización en una sola transacción atómica.",
+    "steps": [
+      "Implementar `LocalLoanRepository` con métodos `getActiveLoans()`, `getLoanById()` y `recordPaymentTransaction()`.",
+      "Encapsular el registro de cobro dentro de una transacción `database.transaction(() async { ... })`.",
+      "Actualizar el saldo del préstamo local (`balance -= amountPaid`) e incrementar `installmentsPaid`.",
+      "Insertar el registro en `LocalPayments` y crear el evento en `LocalSyncQueue`.",
+      "Escribir tests unitarios que simulen fallos a mitad de proceso para validar que la transacción hace rollback si ocurre una excepción."
+    ],
+    "files": [
+      "lib/features/loans/data/repositories/local_loan_repository_impl.dart",
+      "test/features/loans/local_loan_repository_test.dart"
+    ],
+    "deliverable": "Manejo de transacciones atómicas localmente sin riesgo de inconsistencia de saldos."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Desarrollar módulos de registro de clientes, ventas a crédito y abonos en ruta",
+    "desc": "Construir las interfaces y controladores a cargo de Cesar para dar de alta clientes en campo, originar nuevos contratos de crédito y procesar pagos diarios en ruta.",
+    "steps": [
+      "Crear pantalla `CreateClientScreen` con captura de documento, nombre, teléfono, geolocalización GPS actual y foto de comprobante/negocio.",
+      "Crear pantalla `CreateLoanScreen` con selector de monto, plazo, frecuencia (diario, semanal) y tipo de interés (fijo, francés).",
+      "Calcular y previsualizar en tiempo real la tabla de amortización y valor de cada cuota antes de confirmar el crédito.",
+      "Integrar validaciones de negocio (monto mínimo/máximo por cobrador, límite de crédito por cliente).",
+      "Guardar el nuevo cliente y crédito en la base local con UUID v4 y generar los eventos en la cola de sincronización."
+    ],
+    "files": [
+      "lib/features/clients/presentation/screens/create_client_screen.dart",
+      "lib/features/loans/presentation/screens/create_loan_screen.dart"
+    ],
+    "deliverable": "Módulos de alta de clientes y originación de créditos completamente funcionales offline."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Diseñar pantalla principal 'Lista Táctica de Cobro'",
+    "desc": "Diseñar la interfaz central del cobrador en ruta, optimizada como una lista de trabajo secuencial con indicadores visuales claros (Pendiente, Cobrado, Ausente, Mora) y acceso rápido a cobro.",
+    "steps": [
+      "Diseñar componente `CollectorTaskCard` mostrando: número de orden de visita, nombre del cliente, saldo pendiente, cuota esperada y estado de cobro.",
+      "Implementar gestos táctiles ergonómicos: swipe a la derecha para cobro express, swipe a la izquierda para registrar 'No Pago / Ausente'.",
+      "Añadir barra de progreso del día: `Cobrado $X / Meta $Y` y contador de `Clientes Visitados N/Total`.",
+      "Integrar buscador rápido por nombre, dirección o documento del cliente con filtrado instantáneo en memoria.",
+      "Garantizar renderizado a 60 FPS con listas recicladas (`ListView.builder`) para carteras de hasta 500 clientes."
+    ],
+    "files": [
+      "lib/features/loans/presentation/screens/tactical_collection_screen.dart",
+      "lib/features/loans/presentation/widgets/collector_task_card.dart"
+    ],
+    "deliverable": "Pantalla táctica principal ergonómica y ultra-rápida para operación en la calle."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Implementar componente 'Cobro Express' con teclado numérico gigante y respuesta háptica",
+    "desc": "Construir el modal de cobro ultra-rápido diseñado para completar un pago en máximo 2 toques, con teclado numérico grande y feedback háptico para evitar errores involuntarios.",
+    "steps": [
+      "Crear modal `ExpressPaymentBottomSheet` con botones de monto predefinidos (1 cuota, 2 cuotas, saldo total, monto personalizado).",
+      "Diseñar teclado numérico en pantalla grande para uso con guantes o en movimiento con una sola mano.",
+      "Integrar feedback háptico usando `HapticFeedback.mediumImpact()` al presionar teclas y `HapticFeedback.heavyImpact()` al confirmar el pago.",
+      "Añadir sonido suave de confirmación al registrar el abono exitosamente.",
+      "Disparar inmediatamente el flujo de impresión de recibo térmico tras confirmar el abono."
+    ],
+    "files": [
+      "lib/features/loans/presentation/widgets/express_payment_bottom_sheet.dart",
+      "lib/core/utils/haptic_feedback_helper.dart"
+    ],
+    "deliverable": "Módulo de cobro express en 2 toques con respuesta háptica y auditiva."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Pantalla de Arqueo y Cuadre de Caja para final de jornada",
+    "desc": "Pantalla para que el cobrador cierre su turno, compare el efectivo recaudado en la calle contra los registros del sistema, registre gastos operativos de ruta y genere el comprobante de cierre.",
+    "steps": [
+      "Diseñar `CashBoxClosingScreen` con resumen de: Base inicial entregada, Total recaudado en efectivo, Gastos de ruta (gasolina, viáticos) y Total a entregar.",
+      "Permitir desglose de billetes y monedas (conteo físico de efectivo).",
+      "Calcular automáticamente la diferencia (Cuadre exacto / Sobrante / Faltante).",
+      "Generar el registro de cierre de caja en la base de datos local y encolar evento de auditoría.",
+      "Permitir la impresión térmica del comprobante de Arqueo Diario para entrega al supervisor."
+    ],
+    "files": [
+      "lib/features/cashbox/presentation/screens/cash_box_closing_screen.dart",
+      "lib/features/cashbox/data/models/cash_box_summary.dart"
+    ],
+    "deliverable": "Módulo completo de arqueo y cuadre de caja diaria para el cierre de jornada."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Diseñar modelo SyncEvent con UUID, vector clock y payload JSON",
+    "desc": "Definir la estructura formal de los eventos de sincronización CRDT que se generarán en el cliente móvil para garantizar resolución de conflictos sin pérdida de datos.",
+    "steps": [
+      "Crear clase `SyncEvent` con campos: `id` (UUID v4), `tenantId`, `aggregateType` ('PAYMENT', 'LOAN', 'CLIENT'), `aggregateId`, `eventType` ('CREATED', 'UPDATED', 'PAID'), `payload` (Map<String, dynamic>), `vectorClock` (int secuencial por cobrador), `deviceTimestamp` (ISO-8601 UTC) y `status` ('PENDING', 'SYNCING', 'SYNCED', 'FAILED').",
+      "Implementar métodos de serialización `toJson()` y `fromJson()`.",
+      "Añadir validaciones para asegurar que el payload no contenga referencias nulas corruptas.",
+      "Escribir tests unitarios de serialización y deserialización."
+    ],
+    "files": [
+      "lib/features/sync/domain/entities/sync_event.dart",
+      "lib/features/sync/data/models/sync_event_model.dart"
+    ],
+    "deliverable": "Modelo de evento CRDT inmutable e integrable con el motor de sincronización."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Crear sincronizador de fondo que detecte cambios en el estado de red",
+    "desc": "Implementar el servicio en segundo plano que monitorea la conectividad a internet y dispara automáticamente la sincronización por lotes sin interrumpir al cobrador.",
+    "steps": [
+      "Utilizar `connectivity_plus` para escuchar el stream de cambios de estado de red (`wifi`, `mobile`, `none`).",
+      "Configurar `WorkManager` (Android) y `BackgroundFetch` (iOS) para tareas periódicas de sincronización en segundo plano.",
+      "Al detectar reconexión a internet, verificar si existen eventos pendientes en `LocalSyncQueue`.",
+      "Empaquetar los eventos en lotes de hasta 50 transacciones y enviarlos mediante `POST /api/v1/sync/events` a Supabase.",
+      "Al recibir confirmación exitosa (ACK) con los IDs procesados, marcar los eventos como `SYNCED` y purgar los antiguos de la cola.",
+      "Mostrar indicador visual discreto en la barra superior (Nube verde = Sincronizado, Nube amarilla = Sincronizando, Nube gris = Offline)."
+    ],
+    "files": [
+      "lib/features/sync/data/services/sync_background_service.dart",
+      "lib/features/sync/presentation/widgets/sync_status_indicator.dart"
+    ],
+    "deliverable": "Sincronizador automático transparente ante cambios de conectividad."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "006",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Construir layout responsivo con Sidebar navegable y Header con perfil",
+    "desc": "Desarrollar la estructura visual del panel web de administración a cargo de Angel (`app/(dashboard)/layout.tsx`) con barra lateral colapsable, selector de tenant, navegación por módulos y menú de usuario.",
+    "steps": [
+      "Crear `components/dashboard/sidebar.tsx` con enlaces a: Resumen (/dashboard), Cobradores (/collectors), Clientes (/clients), Créditos (/loans), Rutas (/routes), Caja (/cashbox) y Configuración (/settings).",
+      "Implementar versión responsiva con `Sheet` móvil para navegación fluida en tablets y celulares.",
+      "Crear `components/dashboard/header.tsx` con selector de sucursal/tenant, notificaciones y menú dropdown de perfil con avatar de Google OAuth.",
+      "Integrar modo oscuro y claro con `next-themes`.",
+      "Asegurar accesibilidad de navegación por teclado y contraste de colores óptimo."
+    ],
+    "files": [
+      "app/(dashboard)/layout.tsx",
+      "components/dashboard/sidebar.tsx",
+      "components/dashboard/header.tsx"
+    ],
+    "deliverable": "Layout administrativo modular, responsivo y con navegación profesional."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "006",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Implementar Dashboard de métricas principales (Tarjetas KPI + Gráficos financieros)",
+    "desc": "Construir la pantalla principal del panel web (`app/(dashboard)/page.tsx`) con indicadores clave de rendimiento (KPIs) en tiempo real y gráficos analíticos.",
+    "steps": [
+      "Crear tarjetas KPI para: Total Recaudado Hoy vs. Meta, Cartera Activa Total, Índice de Morosidad (% y monto) y Clientes Visitados Hoy.",
+      "Integrar gráficos interactivos con `Recharts` / `Tremor`: Gráfico de barras de recaudo semanal y gráfico de pastel de estado de cartera (Al día, En mora 1-30d, En mora >30d).",
+      "Implementar selector de rango de fechas (Hoy, Esta semana, Este mes, Personalizado).",
+      "Configurar carga de datos mediante Server Components con revalidación en tiempo real de Supabase.",
+      "Añadir estados de carga (`loading.tsx`) con skeletons estilizados de Shadcn UI."
+    ],
+    "files": [
+      "app/(dashboard)/page.tsx",
+      "components/dashboard/kpi-card.tsx",
+      "components/dashboard/revenue-chart.tsx",
+      "components/dashboard/portfolio-status-chart.tsx"
+    ],
+    "deliverable": "Dashboard gerencial con analíticas financieras y métricas en tiempo real."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "006",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Desarrollar tabla de clientes y préstamos con filtros y búsqueda",
+    "desc": "Construir la vista de gestión de cartera con tabla de datos interactiva, paginación en el servidor, filtros avanzados por cobrador/estado y vista de detalle.",
+    "steps": [
+      "Crear `app/(dashboard)/loans/page.tsx` utilizando `@tanstack/react-table` y componentes de tabla Shadcn UI.",
+      "Implementar columnas: Código Crédito, Cliente, Cobrador Asignado, Monto Prestado, Saldo Restante, Cuotas Pagadas/Totales, Estado de Mora y Acciones.",
+      "Añadir barra de búsqueda rápida y filtros por estado (`ACTIVO`, `FINALIZADO`, `EN_MORA`) y por cobrador.",
+      "Crear modal / slide-over de Detalle de Crédito con historial de abonos cronológico, tabla de amortización y notas.",
+      "Añadir acciones de refinanciación y anulación supervisada con modal de confirmación."
+    ],
+    "files": [
+      "app/(dashboard)/loans/page.tsx",
+      "components/dashboard/loans-table.tsx",
+      "components/dashboard/loan-detail-drawer.tsx"
+    ],
+    "deliverable": "Tabla de administración de créditos con filtrado potente y visor de detalles."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "006",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Integrar visualización de cobradores y estado de créditos por tenant",
+    "desc": "Crear el módulo de gestión del equipo de campo en la web, permitiendo al administrador ver el rendimiento diario de cada cobrador, su avance de ruta y saldos recaudados.",
+    "steps": [
+      "Crear página `app/(dashboard)/collectors/page.tsx` con listado de cobradores activos.",
+      "Mostrar tarjetas con: Nombre, Cartera Asignada ($), Efectivo en Mano Hoy ($), Clientes Cobrados vs. Pendientes, y Última Hora de Sincronización.",
+      "Permitir asignar o reasignar rutas y clientes entre cobradores con un selector interactivo.",
+      "Permitir bloquear o desactivar accesos de cobradores de forma inmediata.",
+      "Añadir botón para enviar mensaje o notificación push al cobrador."
+    ],
+    "files": [
+      "app/(dashboard)/collectors/page.tsx",
+      "components/dashboard/collector-card.tsx",
+      "components/dashboard/reassign-clients-dialog.tsx"
+    ],
+    "deliverable": "Panel de supervisión y gestión de cobradores en ruta para administradores."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "008",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Configurar Supabase Edge Functions para Webhooks de pago de Lemon Squeezy",
+    "desc": "Desarrollar la función serverless en Deno/TypeScript a cargo de Mujica, alojada en Supabase Edge Functions para recibir las notificaciones de pago y suscripción de Lemon Squeezy.",
+    "steps": [
+      "Crear función con Supabase CLI: `supabase functions new lemon-webhook`.",
+      "Configurar escucha de eventos: `subscription_created`, `subscription_updated`, `subscription_cancelled`, `subscription_resumed`, `subscription_payment_failed`.",
+      "Obtener el `custom_data.tenant_id` y `variant_id` del payload recibido de Lemon Squeezy.",
+      "Mapear la variante de Lemon Squeezy al plan de Flyvest (`Starter`, `Pro`, `Enterprise`).",
+      "Actualizar el registro en `public.tenants` con `subscription_status`, `plan_tier` y `current_period_end`.",
+      "Desplegar la función con `supabase functions deploy lemon-webhook --no-verify-jwt`."
+    ],
+    "files": [
+      "supabase/functions/lemon-webhook/index.ts",
+      "supabase/functions/_shared/lemon-client.ts"
+    ],
+    "deliverable": "Edge Function desplegada que procesa webhooks de pago y actualiza tenants automáticamente."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "008",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Implementar validación de firma HMAC para webhooks",
+    "desc": "Garantizar la autenticidad y seguridad criptográfica de los webhooks entrantes de Lemon Squeezy mediante la verificación del header `X-Signature` con la clave secreta.",
+    "steps": [
+      "Configurar el secret `LEMON_SQUEEZY_WEBHOOK_SECRET` en Supabase Secrets Vault.",
+      "En la Edge Function, capturar el cuerpo crudo de la petición (`req.text()`) y el header `x-signature`.",
+      "Calcular el HMAC SHA-256 del cuerpo crudo utilizando la clave secreta con `crypto.subtle` de Web Crypto API.",
+      "Comparar de forma segura contra tiempos de respuesta constantes (constant-time comparison) para prevenir ataques de temporización.",
+      "Rechazar peticiones no válidas con `401 Unauthorized` antes de procesar cualquier cambio en la base de datos.",
+      "Escribir tests con firmas válidas e inválidas para verificar el rechazo automático."
+    ],
+    "files": [
+      "supabase/functions/lemon-webhook/verify-signature.ts",
+      "supabase/functions/lemon-webhook/index.ts"
+    ],
+    "deliverable": "Validación criptográfica HMAC activa que blinda el endpoint de webhooks contra suplantaciones."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Implementar motor de cálculo de amortización (Fijo, Francés)",
+    "desc": "Construir la biblioteca matemática financiera central a cargo de Mujica para calcular tablas de amortización, cuotas periódicas, desglose de capital/interés y cálculo de mora.",
+    "steps": [
+      "Crear módulo `AmortizationEngine` en el backend NestJS.",
+      "Implementar cálculo de Sistema Fijo (Flat Rate): `Total = Monto * (1 + Interés)`, `Cuota = Total / NroCuotas`.",
+      "Implementar cálculo de Sistema Francés (Amortización progresiva): `Cuota = Monto * [i / (1 - (1+i)^-n)]`, con desglose de amortización a capital e interés por período.",
+      "Soportar frecuencias: Diario (excluyendo o incluyendo domingos), Semanal, Quincenal y Mensual.",
+      "Implementar algoritmo de imputación de pagos: 1° Interés moratorio -> 2° Interés corriente -> 3° Capital.",
+      "Escribir suite de pruebas unitarias exhaustivas con comparaciones contra hojas de cálculo financieras estándar."
+    ],
+    "files": [
+      "services/core/src/modules/loans/domain/amortization-engine.ts",
+      "services/core/src/modules/loans/domain/amortization-engine.spec.ts"
+    ],
+    "deliverable": "Motor de cálculo financiero validado matemáticamente para múltiples modalidades de crédito."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Definir entidad LoanContract con reglas de mora e interés en NestJS",
+    "desc": "Modelar la entidad de dominio `LoanContract` siguiendo principios de Domain-Driven Design (DDD) con métodos para evaluar estado de mora, penalidades y refinanciación.",
+    "steps": [
+      "Definir clase de dominio `LoanContract` con atributos y métodos de encapsulamiento.",
+      "Implementar método `calculateOverdueDays(currentDate)` para determinar días de retraso.",
+      "Implementar método `applyLateFee(rule)` para calcular recargos por mora configurables por tenant.",
+      "Implementar método `applyPayment(amount, paymentDate)` que retorne el nuevo estado del préstamo y desglose del pago.",
+      "Implementar método `refinance(newTerms)` que cierre el contrato anterior y genere uno nuevo con saldo remanente.",
+      "Escribir tests unitarios cubriendo todos los casos de borde (pagos adelantados, pagos parciales, mora severa)."
+    ],
+    "files": [
+      "services/core/src/modules/loans/domain/loan-contract.entity.ts",
+      "services/core/src/modules/loans/domain/loan-contract.spec.ts"
+    ],
+    "deliverable": "Entidad de dominio LoanContract con lógica de negocio encapsulada y testeada."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Escribir tests unitarios para validación matemática de cuotas",
+    "desc": "Crear una batería de pruebas automatizadas con Jest para garantizar precisión decimal absoluta en cobros, intereses y saldos sin errores de redondeo.",
+    "steps": [
+      "Crear archivo `services/core/src/modules/loans/tests/financial-calculations.spec.ts`.",
+      "Probar 50 casos de prueba con diferentes montos, plazos (15 días, 30 días, 60 días) y tasas de interés (10%, 20%, 30%).",
+      "Validar que la suma de todas las cuotas sea exactamente igual al `total_amount` con tolerancia de 0.00 centavos.",
+      "Validar el comportamiento ante años bisiestos y feriados.",
+      "Integrar la ejecución de estos tests en el workflow de CI de GitHub Actions."
+    ],
+    "files": [
+      "services/core/src/modules/loans/tests/financial-calculations.spec.ts"
+    ],
+    "deliverable": "Suite de tests unitarios financieros con 100% de cobertura en lógica de amortización."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "003",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Iniciar estructuración del backend NestJS para reglas de negocio complejas",
+    "desc": "Configurar la arquitectura modular en NestJS para albergar los módulos de negocio que requieren procesamiento pesado, orquestación y auditoría.",
+    "steps": [
+      "Inicializar proyecto NestJS con TypeScript y configurar decoradores de Swagger.",
+      "Crear módulos: `AuthModule`, `TenantsModule`, `UsersModule`, `LoansModule`, `PaymentsModule`, `CashBoxModule`.",
+      "Configurar inyección de dependencias con repositorios PostgreSQL utilizando Prisma o TypeORM.",
+      "Implementar interceptores globales para logging, transformación de respuestas y manejo de excepciones.",
+      "Configurar validación global de DTOs con `class-validator` y `class-transformer`."
+    ],
+    "files": [
+      "services/core/src/app.module.ts",
+      "services/core/src/modules/loans/loans.module.ts"
+    ],
+    "deliverable": "Estructura modular de microservicio NestJS lista para desarrollo de endpoints complejos."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Conectar Upstash Redis con NestJS utilizando BullMQ",
+    "desc": "Configurar el sistema de colas de procesamiento asíncrono BullMQ respaldado por Upstash Redis a cargo de Esteban para encolar tareas pesadas sin saturar la capa gratuita.",
+    "steps": [
+      "Instalar `@nestjs/bullmq` y `bullmq` en el servicio NestJS.",
+      "Configurar la conexión Redis con la URL de Upstash (`rediss://...`) activando soporte TLS.",
+      "Crear cola `sync-events-queue` para el procesamiento en segundo plano de sincronizaciones entrantes.",
+      "Configurar políticas de reintento exponencial (exponential backoff) para reintentar tareas fallidas.",
+      "Establecer TTLs agresivos en las llaves temporales de Redis para no exceder los 256 MB del Free Tier de Upstash."
+    ],
+    "files": [
+      "services/core/src/config/redis.config.ts",
+      "services/core/src/queues/sync-queue.module.ts"
+    ],
+    "deliverable": "Infraestructura de colas BullMQ + Upstash Redis conectada y operativa."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Configurar colas de tareas asíncronas para sincronización",
+    "desc": "Crear los procesadores de cola (Workers) en NestJS que consumen eventos de la cola para persistir cambios en PostgreSQL de forma desacoplada.",
+    "steps": [
+      "Crear procesador `@Processor('sync-events-queue')` con método `@Process('process-batch')`.",
+      "Desempaquetar el lote de eventos recibido del cliente móvil.",
+      "Procesar transacciones en orden cronológico según el vector clock del evento.",
+      "Emitir logs de progreso y registrar tiempos de ejecución para monitoreo.",
+      "Manejar fallos individuales dentro del lote sin abortar los eventos exitosos."
+    ],
+    "files": [
+      "services/core/src/queues/sync-queue.processor.ts"
+    ],
+    "deliverable": "Worker de colas asíncrono para ingesta masiva de transacciones."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Implementar endpoint idempotente de sincronización por lotes /sync/events",
+    "desc": "Construir el endpoint HTTP de alta velocidad que recibe las transacciones acumuladas en los móviles tras horas de trabajo offline.",
+    "steps": [
+      "Crear endpoint `POST /api/v1/sync/events` protegido con JWT y validación de `X-Tenant-ID`.",
+      "Recibir array `SyncEventPayload[]` con ID único, tipo de evento, payload y timestamp.",
+      "Verificar si el `event_id` ya fue procesado previamente en la tabla `processed_events` (garantía de idempotencia). Si ya existe, retornar ACK de éxito sin duplicar el cobro.",
+      "Si es nuevo, encolar el trabajo en BullMQ para procesamiento en segundo plano.",
+      "Retornar inmediatamente respuesta `202 Accepted` con la lista de IDs recibidos en < 100ms."
+    ],
+    "files": [
+      "services/core/src/modules/sync/sync.controller.ts",
+      "services/core/src/modules/sync/sync.service.ts"
+    ],
+    "deliverable": "Endpoint idempotente de sincronización ultra-rápido y protegido contra duplicaciones."
+  },
+  {
+    "phase": "Fase 2 — Core de Negocio & Offline-First (Sem 3-6)",
+    "feature": "002",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Escribir algoritmo de fusión (merge) libre de conflictos CRDT",
+    "desc": "Implementar las reglas de resolución determinista de conflictos para reconciliar pagos simultáneos o actualizaciones concurrentes sobre el mismo crédito.",
+    "steps": [
+      "Definir estrategia CRDT basada en eventos inmutables (Event Sourcing) donde los pagos son aditivos y conmutativos.",
+      "Para modificaciones de datos de clientes (dirección, teléfono), implementar Last-Write-Wins (LWW) basado en el timestamp vectorial más reciente.",
+      "Para pagos concurrentes, acumular las transacciones aplicando orden de llegada a nivel de base de datos.",
+      "Escribir tests simulando dos dispositivos abonando al mismo crédito offline al mismo tiempo y comprobar que al sincronizar el saldo final es exactamente la resta de ambos abonos.",
+      "Validar que ningún cobro pueda ser eliminado o modificado retroactivamente sin un evento de anulación explícito."
+    ],
+    "files": [
+      "services/core/src/modules/sync/domain/crdt-resolver.ts",
+      "services/core/src/modules/sync/domain/crdt-resolver.spec.ts"
+    ],
+    "deliverable": "Algoritmo de reconciliación CRDT que garantiza cero pérdidas de datos ni duplicación de cobros."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Implementar integración nativa Android para Bluetooth Classic y USB OTG",
+    "desc": "Desarrollar los canales nativos (Platform Channels) en Android a cargo de Cesar para conectar la app Flutter con impresoras térmicas portátiles mediante Bluetooth SPP y USB OTG.",
+    "steps": [
+      "Crear clase nativa en Kotlin `ThermalPrinterPlugin.kt` en `android/app/src/main/kotlin/`.",
+      "Implementar escaneo y emparejamiento con dispositivos Bluetooth SPP mediante `BluetoothAdapter`.",
+      "Implementar comunicación con dispositivos USB POS mediante `UsbManager` y `UsbDeviceConnection`.",
+      "Exponer métodos `scanDevices()`, `connect(address)`, `sendRawBytes(byteArray)` y `disconnect()` hacia Flutter.",
+      "Manejar reconexión automática si el Bluetooth se desconecta por distancia.",
+      "Probar con impresoras térmicas portátiles estándar de 58mm (ZJ-5802, MTP-II, PT-210)."
+    ],
+    "files": [
+      "android/app/src/main/kotlin/com/amplify/flyvest/ThermalPrinterPlugin.kt",
+      "lib/features/printing/data/channels/android_printer_channel.dart"
+    ],
+    "deliverable": "Conexión nativa Android con impresoras térmicas Bluetooth Classic y USB OTG."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Implementar integración nativa iOS para Bluetooth BLE (CoreBluetooth)",
+    "desc": "Desarrollar el canal nativo en Swift a cargo de Cesar para comunicación con impresoras térmicas portátiles en dispositivos iPhone/iPad utilizando el framework CoreBluetooth (BLE).",
+    "steps": [
+      "Crear clase en Swift `ThermalPrinterPlugin.swift` en `ios/Runner/`.",
+      "Configurar `CBCentralManager` para escanear periféricos con servicios de impresión comunes (ej. `0xFFE0`, `0x49535343`).",
+      "Mapear características BLE de escritura (`CBCharacteristicWriteWithResponse` / `WithoutResponse`).",
+      "Segmentar arrays de bytes grandes en paquetes MTU de 20-512 bytes para evitar desbordamiento del buffer BLE.",
+      "Solicitar permisos de Bluetooth en `Info.plist` (`NSBluetoothAlwaysUsageDescription`).",
+      "Probar emisión de recibo en iPhone real."
+    ],
+    "files": [
+      "ios/Runner/ThermalPrinterPlugin.swift",
+      "ios/Runner/Info.plist",
+      "lib/features/printing/data/channels/ios_printer_channel.dart"
+    ],
+    "deliverable": "Conectividad nativa iOS BLE con impresoras térmicas portátiles."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Desarrollar maquetador dinámico ESC/POS para tickets de 58mm y 80mm",
+    "desc": "Construir el generador de bytes de comandos ESC/POS universal para maquetar recibos elegantes de pago, préstamos y arqueos adaptados a rollos de 58mm y 80mm.",
+    "steps": [
+      "Crear biblioteca `EscPosBuilder` en Dart.",
+      "Implementar comandos ESC/POS estándar: `ESC @` (inicializar), `ESC a n` (alineación izq/centro/der), `ESC E n` (negrita), `ESC ! n` (tamaño de fuente) y `GS V` (corte de papel).",
+      "Diseñar plantilla de Recibo de Cobro: Logo Amplify/Flyvest, Nombre de Empresa, Fecha/Hora, Datos de Cliente, Monto Cobrado, Saldo Anterior, Saldo Restante, Número de Cuota y Firma.",
+      "Implementar ajuste dinámico de columnas (32 caracteres para 58mm, 48 caracteres para 80mm).",
+      "Añadir función de vista previa visual del recibo en pantalla antes de imprimir."
+    ],
+    "files": [
+      "lib/features/printing/domain/esc_pos_builder.dart",
+      "lib/features/printing/domain/receipt_templates.dart"
+    ],
+    "deliverable": "Motor de maquetación ESC/POS flexible con plantillas adaptativas para 58mm y 80mm."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Implementar generador QR y logotipos para comprobantes",
+    "desc": "Renderizar códigos QR dinámicos e imágenes de logotipo monocromáticas en mapa de bits directamente en los comandos de impresión térmica.",
+    "steps": [
+      "Integrar generador de código QR local con librería `qr` en Dart.",
+      "Convertir la matriz del QR en bytes de comandos ESC/POS (`GS ( k` o mapa de bits `GS v 0`).",
+      "El QR debe contener la URL pública de validación del comprobante: `https://flyvest.app/verify/<uuid>`.",
+      "Implementar conversor de imágenes de logo (PNG/JPG) a mapa de bits monocromático con algoritmo de tramado (dithering Floyd-Steinberg).",
+      "Validar lectura instantánea del QR impreso con la cámara de cualquier teléfono."
+    ],
+    "files": [
+      "lib/features/printing/domain/qr_esc_pos_generator.dart",
+      "lib/features/printing/domain/bitmap_ditherer.dart"
+    ],
+    "deliverable": "Impresión de códigos QR dinámicos y logos nítidos en papel térmico."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Configurar tabla de caracteres CP850 para ortografía en español",
+    "desc": "Configurar la página de códigos en la impresora para renderizar correctamente acentos (á, é, í, ó, ú), eñes (ñ, Ñ) y signos monetarios sin caracteres corruptos.",
+    "steps": [
+      "Emitir comando ESC/POS de selección de página de código: `ESC t 2` (CP850 Multilingual) o `ESC t 16` (WPC1252).",
+      "Mapear caracteres Unicode españoles a los bytes correspondientes en la tabla de caracteres elegida.",
+      "Crear método helper `latin1Encode(text)` para sanitizar y traducir strings antes del envío.",
+      "Escribir test imprimiendo texto de prueba: '¡Cobro Éxitoso! Señor(a) Núñez, cuota pagada: $50.000 COP'.",
+      "Verificar impresión limpia sin símbolos extraños ni espacios en blanco."
+    ],
+    "files": [
+      "lib/features/printing/domain/encoding_helper.dart"
+    ],
+    "deliverable": "Impresión térmica impecable en español con soporte nativo de tildes y eñes."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Pantalla de emparejamiento y selección de impresora por defecto",
+    "desc": "Construir la pantalla de configuración de hardware donde el cobrador busca, empareja, prueba y guarda su impresora favorita.",
+    "steps": [
+      "Crear pantalla `PrinterSettingsScreen` con botón 'Buscar Impresoras Cercanas'.",
+      "Mostrar lista de dispositivos encontrados con nombre, dirección MAC/UUID y nivel de señal.",
+      "Permitir realizar 'Impresión de Prueba' con un toque.",
+      "Guardar el dispositivo seleccionado en `SharedPreferences` como impresora predeterminada.",
+      "Implementar reconexión automática en background al abrir la app de cobro."
+    ],
+    "files": [
+      "lib/features/printing/presentation/screens/printer_settings_screen.dart",
+      "lib/features/printing/data/repositories/printer_preferences.dart"
+    ],
+    "deliverable": "Módulo de gestión y emparejamiento de impresoras amigable y persistente."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "002",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Construir mecanismo de sincronización de datos locales → Supabase",
+    "desc": "Completar la tubería integral que toma eventos de la cola local de Flutter, los transmite a Supabase mediante REST/Edge Functions y descarga actualizaciones del servidor.",
+    "steps": [
+      "Implementar cliente HTTP en Flutter con reintentos automáticos e interceptor de tokens JWT.",
+      "Crear método `syncPendingEvents()` que lea `LocalSyncQueue` y ejecute `POST /sync/events`.",
+      "Implementar descarga de deltas (`GET /sync/pull?since=<timestamp>`) para traer nuevos clientes asignados o créditos creados desde el panel web.",
+      "Aplicar los cambios entrantes en la base de datos local SQLite de forma atómica.",
+      "Manejar errores de red con notificaciones no intrusivas en la interfaz móvil."
+    ],
+    "files": [
+      "lib/features/sync/data/repositories/sync_repository_impl.dart",
+      "lib/features/sync/presentation/bloc/sync_bloc.dart"
+    ],
+    "deliverable": "Sincronización bidireccional cliente-servidor completa y robusta."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "IA",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Integrar interfaz del chat de IA (Gemini / Google AI Studio) en la app Flutter",
+    "desc": "Construir la interfaz de chat interactiva a cargo de Cesar donde el cobrador o supervisor puede hacer preguntas sobre la cartera y recibir asistencia operativa de Gemini.",
+    "steps": [
+      "Crear pantalla `AiAssistantScreen` con diseño de chat conversacional moderno.",
+      "Implementar burbujas de mensaje para usuario y asistente con soporte de renderizado Markdown.",
+      "Añadir sugerencias de preguntas rápidas (chips): '¿A quién debo cobrarle primero hoy?', '¿Cuál es mi recaudo actual?', '¿Quiénes están en mora grave?'.",
+      "Conectar el chat con la Supabase Edge Function `gemini-assistant` pasando el token de usuario para contexto autorizado.",
+      "Manejar estados de 'Escribiendo...', streaming de respuestas y reintentos ante fallos de conexión."
+    ],
+    "files": [
+      "lib/features/ai_assistant/presentation/screens/ai_assistant_screen.dart",
+      "lib/features/ai_assistant/data/repositories/ai_repository_impl.dart"
+    ],
+    "deliverable": "Chat de asistencia inteligente con Gemini integrado en la aplicación móvil."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "008",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Integrar botones de pago y modales de Lemon Squeezy en /pricing",
+    "desc": "Conectar el catálogo de precios de la web a cargo de Angel con el SDK de Lemon Squeezy para desplegar el modal de checkout sin salir del sitio.",
+    "steps": [
+      "Instalar e importar el script de Lemon Squeezy: `https://assets.lemonsqueezy.com/lemon.js`.",
+      "Inicializar `window.createLemonSqueezy()` en el layout de marketing.",
+      "Asociar los botones 'Suscribirme' de cada plan a la URL de checkout correspondiente generada en Lemon Squeezy.",
+      "Pasar parámetros personalizados (`custom_data: { tenant_id: user.tenantId }`) para vincular el pago con la empresa.",
+      "Escuchar el evento `LemonSqueezy.Setup()` y mostrar indicador de carga durante la apertura del checkout.",
+      "Redirigir a `/dashboard?welcome=true` tras la compra exitosa."
+    ],
+    "files": [
+      "app/(marketing)/pricing/page.tsx",
+      "components/pricing/lemon-checkout-button.tsx"
+    ],
+    "deliverable": "Checkout embebido de Lemon Squeezy completamente integrado en la web."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "008",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Construir portal de autogestión de suscripción para clientes",
+    "desc": "Crear la sección de facturación en el panel del dueño (`app/(dashboard)/settings/billing/page.tsx`) para consultar estado de plan, facturas y enlace al portal de cliente de Lemon Squeezy.",
+    "steps": [
+      "Diseñar vista de Facturación mostrando: Plan actual (Starter/Pro/Enterprise), Estado (Activo/En periodo de gracia), Fecha de próxima renovación y Monto mensual.",
+      "Integrar botón 'Gestionar Suscripción' que genere un Customer Portal URL de Lemon Squeezy para cambiar tarjeta o cancelar.",
+      "Mostrar tabla con historial de pagos anteriores y enlaces de descarga de recibos/facturas.",
+      "Implementar alertas visuales si la suscripción entra en estado `past_due`.",
+      "Permitir realizar upgrade o downgrade de plan de forma directa."
+    ],
+    "files": [
+      "app/(dashboard)/settings/billing/page.tsx",
+      "components/dashboard/billing-card.tsx"
+    ],
+    "deliverable": "Portal de autogestión de suscripción y facturación para clientes SaaS."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "007",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Construir Módulo Super-Admin de Amplify en /admin/super",
+    "desc": "Desarrollar el panel de administración global a cargo de Angel, exclusivo para el equipo de desarrollo de Amplify, aislado de los tenants individuales.",
+    "steps": [
+      "Crear ruta protegida `app/(super-admin)/admin/super/page.tsx`.",
+      "Configurar verificación en Server Component contra la tabla `amplify_admins` (solo correos autorizados).",
+      "Mostrar métricas globales: Total Empresas Activas, Total Cobradores en Calle, Volumen Total de Préstamos Administrados y MRR Estimado.",
+      "Implementar buscador y tabla general de todos los tenants con filtros por estado de suscripción (`active`, `past_due`, `canceled`, `trialing`).",
+      "Añadir vista de detalle por empresa con estadísticas de consumo de recursos y actividad."
+    ],
+    "files": [
+      "app/(super-admin)/admin/super/page.tsx",
+      "components/super-admin/global-metrics.tsx",
+      "components/super-admin/tenants-master-table.tsx"
+    ],
+    "deliverable": "Módulo Super-Admin de Amplify funcional y protegido contra accesos no autorizados."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "007",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Dashboard de listado de tenants con filtros por estado de suscripción",
+    "desc": "Construir la tabla maestra de clientes SaaS en el Super-Admin con acciones rápidas, métricas de morosidad comercial y fecha de vencimiento.",
+    "steps": [
+      "Crear componente `TenantsMasterTable` con columnas: Empresa, Dueño / Email, Plan, Cobradores Registrados, Estado de Suscripción, Kill Switch y Acciones.",
+      "Añadir filtros rápidos: 'Todos', 'Activos', 'Morosos (Past Due)', 'Cancelados', 'En Prueba'.",
+      "Implementar búsqueda instantánea por nombre de empresa o correo del administrador.",
+      "Permitir exportar la lista a formato CSV / Excel para reportes de facturación de la agencia.",
+      "Añadir paginación en el servidor con `@tanstack/react-table`."
+    ],
+    "files": [
+      "components/super-admin/tenants-master-table.tsx",
+      "app/(super-admin)/admin/super/tenants/page.tsx"
+    ],
+    "deliverable": "Tabla maestra de administración de empresas SaaS con filtros avanzados."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "007",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Implementar botón de Kill Switch con confirmación y auditoría",
+    "desc": "Desarrollar el interruptor de seguridad que permite a los desarrolladores de Amplify suspender inmediatamente la sincronización de un tenant moroso o en falta.",
+    "steps": [
+      "Crear Server Action `toggleTenantKillSwitch(tenantId, reason)` con validación de rol `SUPER_ADMIN`.",
+      "Diseñar modal de advertencia `KillSwitchDialog` con confirmación explícita (escribir 'SUSPENDER' para confirmar) y campo obligatorio de motivo.",
+      "Al activarse, actualizar `kill_switch_active = true` en la tabla `tenants` y registrar en el log de auditoría `admin_audit_logs` con fecha, admin y motivo.",
+      "El backend rechazará inmediatamente cualquier petición de sincronización móvil del tenant con error `403 Tenant Suspended`.",
+      "Añadir opción para reactivar el tenant con un solo clic una vez solventado el pago."
+    ],
+    "files": [
+      "components/super-admin/kill-switch-dialog.tsx",
+      "app/actions/super-admin.ts"
+    ],
+    "deliverable": "Mecanismo Kill Switch con doble confirmación y registro de auditoría."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "006",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Integrar motor de generación de reportes en PDF y Excel",
+    "desc": "Construir el sistema de exportación de datos contables para generar informes de cartera, estados de cuenta y cierres de caja en formatos XLSX y PDF.",
+    "steps": [
+      "Instalar `xlsx` para generación de hojas de cálculo y `@react-pdf/renderer` / `pdfmake` para documentos PDF.",
+      "Crear generador de Excel para: 'Listado Maestro de Cartera' con columnas formateadas, totales y fórmulas.",
+      "Crear generador de PDF para: 'Estado de Cuenta Individual de Cliente' con diseño membretado de la empresa y desglose de cuotas.",
+      "Crear generador de 'Informe de Cuadre de Caja Diario' para auditorías contables.",
+      "Optimizar la generación en el cliente para no consumir límites de Serverless Functions en Vercel."
+    ],
+    "files": [
+      "lib/reports/excel-generator.ts",
+      "lib/reports/pdf-statement-generator.tsx",
+      "components/dashboard/export-report-dialog.tsx"
+    ],
+    "deliverable": "Módulo de reportes contables con descargas instantáneas en Excel y PDF."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "007",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Crear tabla amplify_admins y vista global de métricas de operación",
+    "desc": "Crear las estructuras en PostgreSQL a cargo de Mujica para el control de acceso del equipo Amplify y las vistas agregadas sin aislamiento de RLS para el Super-Admin.",
+    "steps": [
+      "Crear migración con tabla `amplify_admins` (id, email UNIQUE, name, role, created_at).",
+      "Insertar los correos autorizados iniciales del equipo Amplify.",
+      "Crear vista SQL `v_global_saas_metrics` que consolide métricas totales (tenants, recaudos, cobradores activos).",
+      "Crear función RPC `get_super_admin_analytics()` con permisos `SECURITY DEFINER` accesible solo por usuarios presentes en `amplify_admins`.",
+      "Probar que usuarios convencionales no puedan ejecutar esta función bajo ninguna circunstancia."
+    ],
+    "files": [
+      "supabase/migrations/20260104000000_super_admin_schema.sql"
+    ],
+    "deliverable": "Tablas y vistas SQL de Super-Admin con seguridad estricta y analíticas globales."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "003",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Implementar tabla Event Store en PostgreSQL para eventos inmutables",
+    "desc": "Construir el almacén de eventos inmutable (Event Store) para persistir cada transacción financiera con fines de auditoría legal y resolución CRDT.",
+    "steps": [
+      "Crear tabla `event_store` (id UUID PK, tenant_id UUID FK, stream_id UUID, version INT, event_type VARCHAR, payload JSONB, metadata JSONB, created_at TIMESTAMPTZ DEFAULT NOW()).",
+      "Crear regla o trigger que impida `UPDATE` o `DELETE` sobre la tabla `event_store` (Append-Only estricto).",
+      "Crear índices GIN sobre la columna `payload` para búsquedas rápidas por campos JSON.",
+      "Implementar servicio en NestJS para registrar eventos tras cada operación transaccional.",
+      "Crear endpoints para reproducir el historial de un crédito reconstruyendo su estado a partir de eventos."
+    ],
+    "files": [
+      "supabase/migrations/20260105000000_event_store.sql",
+      "services/core/src/modules/events/event-store.service.ts"
+    ],
+    "deliverable": "Event Store inmutable en PostgreSQL blindado contra alteraciones."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "008",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Implementar feature gating: restricciones de funcionalidad por plan",
+    "desc": "Desarrollar el middleware y guards de autorización que limitan el acceso a ciertas funciones (geolocalización, límites de cobradores, IA) según el plan suscrito en Lemon Squeezy.",
+    "steps": [
+      "Definir matriz de límites por plan: Starter (máx 2 cobradores, sin mapa GPS), Pro (máx 5 cobradores, mapa GPS activo), Enterprise (10+ cobradores, API abierta).",
+      "Crear guard `@PlanRequirement('PRO')` en NestJS para proteger endpoints premium (ej. optimización de rutas).",
+      "Crear trigger en PostgreSQL que impida crear más cobradores si la empresa alcanzó el límite de su `plan_tier`.",
+      "Exponer el estado de features activas en el payload del perfil para que la web y móvil deshabiliten botones no incluidos.",
+      "Escribir tests verificando que usuarios en plan Starter reciben `403 Upgrade Required` al invocar features Pro."
+    ],
+    "files": [
+      "services/core/src/common/guards/plan-tier.guard.ts",
+      "supabase/migrations/20260106000000_plan_limits_trigger.sql"
+    ],
+    "deliverable": "Sistema de Feature Gating automatizado según el plan suscrito."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "006",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Documentar endpoints con Swagger / OpenAPI 3.0",
+    "desc": "Completar la documentación interactiva Swagger de todos los microservicios para facilitar el consumo y futuras integraciones de contabilidad externas.",
+    "steps": [
+      "Añadir decoradores `@ApiOperation()`, `@ApiResponse()`, `@ApiBody()` y `@ApiParam()` en todos los controladores de NestJS.",
+      "Configurar autenticación Bearer JWT en la interfaz de Swagger.",
+      "Organizar endpoints por tags: `Auth`, `Tenants`, `Clients`, `Loans`, `Payments`, `CashBox`, `Routes`, `SuperAdmin`.",
+      "Publicar el endpoint `/api/docs` y exportar `swagger.json` actualizado para generación de SDKs.",
+      "Validar que todos los esquemas de respuesta coincidan exactamente con las respuestas reales de la API."
+    ],
+    "files": [
+      "services/core/src/main.ts",
+      "docs/swagger.json"
+    ],
+    "deliverable": "Documentación Swagger 3.0 interactiva y completa de toda la API."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "005",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Desarrollar microservicio Go de alta concurrencia",
+    "desc": "Construir el microservicio en lenguaje Go a cargo de Esteban, optimizado para operaciones concurrentes pesadas, cálculos geométricos y procesamiento en paralelo.",
+    "steps": [
+      "Inicializar módulo Go: `go mod init github.com/amplify/flyvest-worker`.",
+      "Configurar servidor HTTP ultraligero con `gin-gonic/gin` o `fiber`.",
+      "Configurar cliente Redis con `go-redis/v9` para consumir trabajos de BullMQ.",
+      "Implementar Goroutines y Channels para procesar cálculos de rutas de múltiples empresas en paralelo.",
+      "Mantener el uso de memoria bajo (< 50MB) para ajustarse holgadamente a los 512MB gratuitos de Render.",
+      "Crear `Dockerfile` multi-stage optimizado que genere una imagen final Scratch/Alpine de < 15MB."
+    ],
+    "files": [
+      "services/worker/main.go",
+      "services/worker/go.mod",
+      "services/worker/Dockerfile"
+    ],
+    "deliverable": "Microservicio Go ultraligero, de alto rendimiento y bajo consumo de memoria."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "005",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Implementar algoritmo de Optimización de Rutas (TSP aproximado + Haversine)",
+    "desc": "Programar en Go el algoritmo de optimización del problema del vendedor viajero (TSP) utilizando heurística 2-Opt y cálculo de distancia Haversine para ordenar las visitas de cobro.",
+    "steps": [
+      "Implementar función de cálculo de distancia ortodrómica Haversine en Go: `Distance(lat1, lon1, lat2, lon2) float64`.",
+      "Implementar algoritmo del vecino más cercano (Nearest Neighbor) para construir la ruta inicial.",
+      "Aplicar algoritmo de optimización local 2-Opt para desenredar cruces y minimizar la distancia total recorrida.",
+      "Permitir fijar la ubicación actual del cobrador como punto de partida.",
+      "Retornar la lista ordenada de IDs de clientes con distancia estimada y tiempo de traslado.",
+      "Escribir benchmarks en Go (`go test -bench=.`) comprobando que optimiza 300 clientes en < 5 milisegundos."
+    ],
+    "files": [
+      "services/worker/pkg/geo/haversine.go",
+      "services/worker/pkg/optimizer/tsp_2opt.go",
+      "services/worker/pkg/optimizer/tsp_test.go"
+    ],
+    "deliverable": "Algoritmo de optimización de rutas TSP ultra-rápido implementado en Go."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "005",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Crear endpoint de reordenamiento de ruta por menor distancia",
+    "desc": "Exponer el servicio de optimización de rutas mediante una API REST protegida para que la app móvil y el panel web reordenen la secuencia de visitas.",
+    "steps": [
+      "Crear endpoint `POST /api/v1/routes/optimize` en el microservicio Go.",
+      "Recibir payload: `{ collector_lat: float, collector_lng: float, clients: [{ id, lat, lng, priority }] }`.",
+      "Ejecutar el algoritmo 2-Opt en paralelo para las peticiones entrantes.",
+      "Retornar el orden optimizado con el nuevo índice `route_order` para cada cliente.",
+      "Persistir el nuevo orden en la base de datos de Supabase si la petición proviene del panel administrativo.",
+      "Manejar casos especiales (clientes sin coordenadas GPS registradas colocándolos al final)."
+    ],
+    "files": [
+      "services/worker/api/routes_handler.go",
+      "services/worker/api/routes_handler_test.go"
+    ],
+    "deliverable": "Endpoint de optimización de rutas operativo y de respuesta instantánea."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "005",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Validar geocercas y almacenar trazado GPS histórico por cobrador",
+    "desc": "Desarrollar el servicio que valida si el cobrador estaba físicamente cerca del cliente al registrar el cobro (Geocerca) y guarda el historial de recorrido.",
+    "steps": [
+      "Crear tabla `collector_gps_logs` (id, tenant_id, collector_id, lat, lng, speed, battery, recorded_at).",
+      "Implementar función `VerifyGeofence(clientLat, clientLng, collectorLat, collectorLng, radiusMeters)`.",
+      "Al recibir un pago, verificar si el cobrador estaba dentro del radio configurado (ej. 50 metros).",
+      "Marcar el cobro con un badge `geofence_verified: true/false` para auditoría de supervisores.",
+      "Comprimir y purgar trazados GPS de más de 30 días para no saturar los 500MB de Supabase."
+    ],
+    "files": [
+      "services/worker/pkg/geo/geofence.go",
+      "supabase/migrations/20260107000000_gps_tracking.sql"
+    ],
+    "deliverable": "Módulo de validación por geocercas y trazabilidad GPS en ruta."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "002",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Pruebas de estrés: simulación de reconexión tras 8 horas offline",
+    "desc": "Realizar pruebas de carga y estrés a cargo de Esteban, simulando 200 cobradores sincronizando simultáneamente 15,000 transacciones acumuladas para validar la resiliencia del sistema.",
+    "steps": [
+      "Crear script de prueba de carga con `k6` o Go (`vegeta` / `hey`).",
+      "Simular 200 clientes concurrentes enviando lotes de 75 transacciones cada uno.",
+      "Monitorear el comportamiento de Upstash Redis (comandos por segundo) y Supabase (conexiones de pool y uso de CPU).",
+      "Verificar que no ocurran bloqueos de base de datos (deadlocks) ni errores 500.",
+      "Comprobar que todas las 15,000 transacciones queden registradas sin duplicaciones ni pérdidas.",
+      "Documentar los resultados de latencia (P95 < 250ms) y rendimiento."
+    ],
+    "files": [
+      "tests/load/k6-sync-stress.js",
+      "docs/load-test-results.md"
+    ],
+    "deliverable": "Informe de pruebas de estrés validando la estabilidad bajo carga masiva de sincronización."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "004",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Monitorear Cold Starts y optimizar límites de planes gratuitos",
+    "desc": "Implementar estrategias de mitigación de inicios en frío (Cold Starts) en Render y Koyeb para mantener la experiencia fluida sin salir del Free Tier.",
+    "steps": [
+      "Configurar un cron job interno (cron ligero o Supabase Cron) que envíe un 'ping' de salud (`GET /health`) cada 14 minutos a Render y Koyeb.",
+      "Asegurar que la arquitectura Local-First en Flutter absorba cualquier latencia de inicio en frío sin bloquear al usuario en la calle.",
+      "Configurar alertas en Upstash Redis para notificar si se alcanza el 80% del límite diario de 10k comandos.",
+      "Configurar política de retención de logs y vaciado de caché para mantenerse bajo los 256MB.",
+      "Documentar el checklist de activación para la migración inmediata a planes de pago cuando ingresen los primeros 3 clientes."
+    ],
+    "files": [
+      "scripts/keep-alive.sh",
+      "docs/free-tier-optimization.md"
+    ],
+    "deliverable": "Estrategias de keep-alive y monitoreo de límites del Free Tier implementadas."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Test unitario de filtrado RLS (prevenir leak de datos entre tenants)",
+    "desc": "Ejecutar batería de pruebas de seguridad automatizadas a cargo de Mujica para certificar que ninguna consulta a PostgreSQL retorne datos de otra organización.",
+    "steps": [
+      "Crear suite de pruebas de seguridad SQL con `pgTAP` o Jest.",
+      "Crear Tenant A y Tenant B con usuarios y préstamos de prueba.",
+      "Autenticar como Tenant A y ejecutar consultas directas sobre tablas `clients`, `loans`, `payments`.",
+      "Verificar que el resultado contenga 0 registros de Tenant B en todas las combinaciones posibles.",
+      "Intentar inyección de IDs de Tenant B en operaciones de `UPDATE` e `INSERT` y verificar rechazo estricto.",
+      "Generar reporte de auditoría de seguridad multi-tenant."
+    ],
+    "files": [
+      "tests/security/rls-leak-audit.spec.ts"
+    ],
+    "deliverable": "Certificación de seguridad RLS sin vulnerabilidades de fuga entre tenants."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "001",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Test e2e de login y renovación de tokens",
+    "desc": "Probar de punta a punta el ciclo de vida de los tokens de autenticación (JWT) y su renovación transparente (Refresh Token) en clientes web y móvil.",
+    "steps": [
+      "Crear prueba end-to-end con Playwright / Cypress para el login web con Google OAuth.",
+      "Simular expiración del Access Token (JWT) tras su tiempo de vida configurado.",
+      "Validar que el cliente invoque automáticamente el endpoint de refresh token con cookies seguras.",
+      "Comprobar que la sesión se renueve sin forzar un relogin al usuario.",
+      "Probar revocación de refresh token al cerrar sesión explícitamente."
+    ],
+    "files": [
+      "tests/e2e/auth-flow.spec.ts"
+    ],
+    "deliverable": "Pruebas E2E de ciclo de vida de autenticación 100% aprobadas."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "008",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Test e2e del flujo completo: compra → webhook → activación de plan",
+    "desc": "Verificar en entorno sandbox de Lemon Squeezy el flujo completo desde el checkout del cliente hasta la activación instantánea de funcionalidades en su cuenta.",
+    "steps": [
+      "Configurar tienda de prueba en modo Sandbox en Lemon Squeezy.",
+      "Completar una compra de prueba con tarjeta de prueba en `/pricing`.",
+      "Verificar la recepción del webhook en la Supabase Edge Function con firma válida.",
+      "Comprobar que el campo `subscription_status` del tenant cambie a `active` y `plan_tier` a `pro` en PostgreSQL.",
+      "Verificar que el panel web desbloquee inmediatamente los reportes avanzados y el módulo de rutas.",
+      "Simular cancelación de suscripción y verificar la degradación correspondiente."
+    ],
+    "files": [
+      "tests/e2e/lemon-squeezy-flow.spec.ts"
+    ],
+    "deliverable": "Flujo completo de monetización validado de extremo a extremo en sandbox."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "007",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Test de acceso: verificar que usuarios no-admin son rechazados",
+    "desc": "Comprobar a cargo de Angel que la ruta protegida `/admin/super` y sus Server Actions sean totalmente inaccesibles para clientes regulares y atacantes externos.",
+    "steps": [
+      "Intentar acceder a `/admin/super` sin sesión y verificar redirección a `/login`.",
+      "Autenticar como `COMPANY_ADMIN` (dueño de negocio normal) e intentar ingresar a `/admin/super`.",
+      "Verificar que el middleware y Server Components retornen `403 Forbidden` o página 404.",
+      "Intentar invocar directamente la Server Action de Kill Switch y comprobar rechazo estricto.",
+      "Autenticar como un correo presente en `amplify_admins` y verificar acceso fluido."
+    ],
+    "files": [
+      "tests/security/super-admin-rbac.spec.ts"
+    ],
+    "deliverable": "Pruebas de blindaje de acceso al Super-Admin 100% superadas."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "005",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Implementar captura de ubicación GPS con permisos en segundo plano",
+    "desc": "Configurar la adquisición precisa de coordenadas geográficas en la app Flutter a cargo de Cesar, con bajo consumo de batería y manejo amigable de permisos.",
+    "steps": [
+      "Instalar y configurar `geolocator: ^11.x` en Flutter.",
+      "Configurar permisos en `AndroidManifest.xml` (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION`).",
+      "Configurar permisos en `Info.plist` (`NSLocationWhenInUseUsageDescription`, `NSLocationAlwaysAndWhenInUseUsageDescription`).",
+      "Implementar flujo de solicitud de permisos con diálogo explicativo previo.",
+      "Capturar coordenadas al momento de registrar cobros y visitas.",
+      "Optimizar precisión (`LocationAccuracy.high` solo al registrar cobro, `medium` durante desplazamiento) para ahorrar batería."
+    ],
+    "files": [
+      "lib/features/routes/data/services/location_service.dart",
+      "lib/features/routes/presentation/widgets/location_permission_dialog.dart"
+    ],
+    "deliverable": "Servicio de geolocalización móvil eficiente y con gestión de permisos impecable."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "005",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Diseñar vista de mapa interactivo con pines de clientes (Pendiente/Cobrado/Ausente)",
+    "desc": "Construir la pantalla de mapa geográfico en Flutter para visualizar toda la cartera del día con pines de colores según su estado operativo.",
+    "steps": [
+      "Integrar `flutter_map` con capas de mapa OpenStreetMap / Mapbox sin costo.",
+      "Renderizar pines personalizados: Verde (Cobrado), Amarillo (Pendiente de cobro), Rojo (En mora >15 días), Gris (Ausente/No pago).",
+      "Al tocar un pin, abrir tarjeta flotante inferior con información rápida del cliente y botón de Cobro Express.",
+      "Trazar polilínea de la ruta óptima sugerida conectando los clientes en secuencia.",
+      "Permitir centrar la vista en la ubicación GPS actual del cobrador con un toque."
+    ],
+    "files": [
+      "lib/features/routes/presentation/screens/route_map_screen.dart",
+      "lib/features/routes/presentation/widgets/client_map_marker.dart"
+    ],
+    "deliverable": "Mapa interactivo de ruta en tiempo real con marcadores por estado de cobro."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "005",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Agregar accesos directos de navegación externa (Google Maps/Waze)",
+    "desc": "Permitir al cobrador abrir la dirección del cliente en su app de navegación GPS favorita con un solo toque desde la tarjeta de cobro.",
+    "steps": [
+      "Instalar `url_launcher` en el proyecto Flutter.",
+      "Implementar helper `openNavigationApp({lat, lng, address})`.",
+      "Detectar apps instaladas en el dispositivo (Google Maps, Waze, Apple Maps).",
+      "Si hay múltiples opciones, mostrar selector rápido '¿Cómo deseas llegar?': Google Maps / Waze / Apple Maps.",
+      "Lanzar la ruta de navegación con un intent nativo pasando las coordenadas exactas de destino.",
+      "Probar apertura instantánea en dispositivos Android e iOS."
+    ],
+    "files": [
+      "lib/features/routes/domain/navigation_launcher.dart"
+    ],
+    "deliverable": "Integración con 1 toque hacia Google Maps, Waze y Apple Maps."
+  },
+  {
+    "phase": "QA & Preparación de Lanzamiento",
+    "feature": "ALL",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Preparar build de producción y despliegue a hosting",
+    "desc": "Generar los artefactos finales de producción optimizados a cargo de Esteban (APK Release para Android, bundles de Vercel y binarios de microservicios) para el lanzamiento.",
+    "steps": [
+      "Compilar APK firmado para Android: `flutter build apk --release --split-per-abi`.",
+      "Verificar optimización de bundles en Next.js (`npm run build`) y verificar tamaño de chunks en Vercel.",
+      "Verificar despliegue del worker de Go en Render con variables de producción.",
+      "Realizar smoke testing completo en el entorno de producción (Registro -> Creación de crédito -> Cobro en móvil -> Impresión -> Sincronización -> Reflejo en Web).",
+      "Crear tag de versión `v1.0.0-mvp` en GitHub con Release Notes detalladas."
+    ],
+    "files": [
+      "release-notes-v1.0.0.md",
+      ".github/workflows/release.yml"
+    ],
+    "deliverable": "Builds de producción generados y desplegados listos para usuarios finales."
+  }
+];
+
+    // ===== TASK PERSISTENCE & CACHE STORAGE STORE =====
+    const STORAGE_KEY = 'flyvest-tasks-v3';
+    const CACHE_NAME_TASKS = 'flyvest-tasks-cache';
+
+    const TaskStore = {
+      getCompleted: function() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              return new Set(parsed.map(Number));
+            }
+          }
+        } catch(e) {
+          console.warn('[TaskStore] Error al leer de localStorage:', e);
+        }
+        return new Set();
+      },
+
+      saveCompleted: function(set) {
+        const arr = Array.from(set);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+        } catch(e) {
+          console.warn('[TaskStore] Error al guardar en localStorage:', e);
+        }
+
+        // Sincronizar en memoria de Cache Storage para redundancia offline
+        if ('caches' in window) {
+          caches.open(CACHE_NAME_TASKS).then(cache => {
+            const data = {
+              completedTasks: arr,
+              timestamp: Date.now(),
+              totalTasks: TASKS.length
+            };
+            const response = new Response(JSON.stringify(data), {
+              headers: { 'Content-Type': 'application/json' }
+            });
+            cache.put('/flyvest-offline-tasks-backup', response).catch(() => {});
+          }).catch(() => {});
+        }
+
+        const statusEl = document.getElementById('taskCacheStatus');
+        if (statusEl) {
+          statusEl.textContent = `Progreso guardado (${arr.length} tareas completadas en caché local)`;
+        }
+      },
+
+      restoreFromCacheIfAvailable: async function() {
+        if ('caches' in window) {
+          try {
+            const cache = await caches.open(CACHE_NAME_TASKS);
+            const response = await cache.match('/flyvest-offline-tasks-backup');
+            if (response) {
+              const data = await response.json();
+              if (data && Array.isArray(data.completedTasks) && data.completedTasks.length > 0) {
+                if (completedTasks.size === 0) {
+                  completedTasks = new Set(data.completedTasks.map(Number));
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(data.completedTasks));
+                  renderTasks();
+                  console.log('[TaskStore] Tareas restauradas desde caché offline redundante:', data.completedTasks.length);
+                }
+              }
+            }
+          } catch(err) {
+            console.warn('[TaskStore] Error al sincronizar con Cache Storage:', err);
+          }
+        }
+      },
+
+      resetAll: function() {
+        if (confirm('¿Estás seguro de que deseas reiniciar todas las tareas completadas? Esta acción no se puede deshacer.')) {
+          completedTasks.clear();
+          this.saveCompleted(completedTasks);
+          renderTasks();
+          if (currentModalIdx !== null) updateModalStatus(currentModalIdx);
+        }
+      }
+    };
+
+    // ===== STATE =====
+    let completedTasks = TaskStore.getCompleted();
+    let activeFilter = 'all';
+    let currentModalIdx = null;
+
+    // ===== RENDER TASKS =====
+    function renderTasks() {
+      const container = document.getElementById('taskContainer');
+      container.innerHTML = '';
+
+      const phases = {};
+      TASKS.forEach((task, idx) => {
+        if (activeFilter !== 'all' && String(task.dev) !== activeFilter) return;
+        if (!phases[task.phase]) phases[task.phase] = [];
+        phases[task.phase].push({ ...task, idx });
+      });
+
+      const devNames = {
+        1: '📱 Cesar (Dev 1)',
+        2: '💻 Angel (Dev 2)',
+        3: '🗄️ Mujica (Dev 3)',
+        4: '⚙️ Esteban (Dev 4)'
+      };
+      const phaseColors = {
+        'Fase 1': 'var(--accent-blue)',
+        'Fase 2': 'var(--accent-purple)',
+        'Fase 3': 'var(--accent-orange)',
+        'QA': 'var(--accent-green)',
+      };
+
+      Object.entries(phases).forEach(([phaseName, tasks]) => {
+        const phaseDiv = document.createElement('div');
+        phaseDiv.className = 'task-phase';
+
+        const colorKey = Object.keys(phaseColors).find(k => phaseName.startsWith(k)) || 'Fase 1';
+        const color = phaseColors[colorKey];
+
+        const completedInPhase = tasks.filter(t => completedTasks.has(t.idx)).length;
+        const totalInPhase = tasks.length;
+
+        phaseDiv.innerHTML = `
+          <div class="phase-header" onclick="togglePhase(this)">
+            <span class="phase-arrow">▼</span>
+            <span class="phase-title">${phaseName}</span>
+            <span class="phase-badge" style="background: ${color}20; color: ${color};">${completedInPhase}/${totalInPhase}</span>
+          </div>
+          <ul class="task-list" id="phase-${phaseName.replace(/[^a-zA-Z0-9]/g, '')}">
+            ${tasks.map(task => `
+              <li class="task-item ${completedTasks.has(task.idx) ? 'completed' : ''}" onclick="openTaskModal(${task.idx})">
+                <div class="task-checkbox ${completedTasks.has(task.idx) ? 'checked' : ''}" onclick="toggleTaskCheckbox(event, ${task.idx})"></div>
+                <span class="task-text"><strong>[Feature ${task.feature}]</strong> ${task.text}</span>
+                <div class="task-actions">
+                  <span class="task-guide-btn">💡 <span>Ver Paso a Paso</span></span>
+                  <span class="task-dev-tag" data-dev="${task.dev}">${devNames[task.dev]}</span>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+        container.appendChild(phaseDiv);
+      });
+
+      updateProgress();
+    }
+
+    function toggleTaskCheckbox(event, idx) {
+      event.stopPropagation();
+      if (completedTasks.has(idx)) {
+        completedTasks.delete(idx);
+      } else {
+        completedTasks.add(idx);
+      }
+      TaskStore.saveCompleted(completedTasks);
+      renderTasks();
+      if (currentModalIdx === idx) {
+        updateModalStatus(idx);
+      }
+    }
+
+    function togglePhase(header) {
+      header.classList.toggle('collapsed');
+      const list = header.nextElementSibling;
+      list.classList.toggle('hidden');
+    }
+
+    function updateProgress() {
+      const visibleTasks = TASKS.filter(t => activeFilter === 'all' || String(t.dev) === activeFilter);
+      const completed = visibleTasks.filter((t, i) => completedTasks.has(TASKS.indexOf(t))).length;
+      const total = visibleTasks.length;
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      document.getElementById('progressPercent').textContent = percent + '%';
+      document.getElementById('progressBar').style.width = percent + '%';
+      document.getElementById('progressCount').textContent = `${completed} / ${total} tareas completadas`;
+    }
+
+    // ===== MODAL FUNCTIONS =====
+    function openTaskModal(idx) {
+      currentModalIdx = idx;
+      const task = TASKS[idx];
+      if (!task) return;
+
+      const devDetails = {
+        1: { name: '📱 Cesar — Mobile & Hardware Lead', color: 'var(--dev1-color)', bg: 'rgba(99,179,237,0.12)' },
+        2: { name: '💻 Angel — Frontend Web & UX Lead', color: 'var(--dev2-color)', bg: 'rgba(128,90,213,0.12)' },
+        3: { name: '🗄️ Mujica — Backend Core & DB Lead', color: 'var(--dev3-color)', bg: 'rgba(56,178,172,0.12)' },
+        4: { name: '⚙️ Esteban — DevOps & Workers Lead', color: 'var(--dev4-color)', bg: 'rgba(237,137,54,0.12)' }
+      };
+
+      const devInfo = devDetails[task.dev] || { name: 'Dev', color: '#fff', bg: '#222' };
+
+      document.getElementById('modalFeatureBadge').textContent = `Feature ${task.feature}`;
+      document.getElementById('modalDevBadge').textContent = devInfo.name;
+      document.getElementById('modalDevBadge').style.color = devInfo.color;
+      document.getElementById('modalDevBadge').style.background = devInfo.bg;
+
+      document.getElementById('modalTaskTitle').textContent = task.text;
+      document.getElementById('modalTaskDesc').textContent = task.desc || 'Sin descripción disponible.';
+
+      // Steps
+      const stepsList = document.getElementById('modalStepsList');
+      stepsList.innerHTML = '';
+      if (task.steps && task.steps.length > 0) {
+        task.steps.forEach((step, sIdx) => {
+          const li = document.createElement('li');
+          li.className = 'modal-step-item';
+          li.innerHTML = `
+            <div class="modal-step-num">${sIdx + 1}</div>
+            <div class="modal-step-text">${formatStepText(step)}</div>
+          `;
+          stepsList.appendChild(li);
+        });
+      } else {
+        stepsList.innerHTML = '<li class="modal-step-item">No hay pasos detallados configurados.</li>';
+      }
+
+      // Files
+      const filesList = document.getElementById('modalFilesList');
+      filesList.innerHTML = '';
+      if (task.files && task.files.length > 0) {
+        task.files.forEach(file => {
+          const li = document.createElement('li');
+          li.textContent = `• ${file}`;
+          filesList.appendChild(li);
+        });
+      } else {
+        filesList.innerHTML = '<li>• No especificado</li>';
+      }
+
+      // Deliverable
+      document.getElementById('modalDeliverable').textContent = task.deliverable || 'Entregable de código verificado.';
+
+      // Status
+      updateModalStatus(idx);
+
+      // Show modal
+      document.getElementById('taskModalBackdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function formatStepText(text) {
+      return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    function updateModalStatus(idx) {
+      const isDone = completedTasks.has(idx);
+      const statusBadge = document.getElementById('modalStatusBadge');
+      const toggleBtn = document.getElementById('modalToggleBtn');
+
+      if (isDone) {
+        statusBadge.textContent = '✅ Completada';
+        statusBadge.style.background = 'rgba(72,187,120,0.15)';
+        statusBadge.style.color = 'var(--accent-green)';
+        toggleBtn.textContent = '↩ Desmarcar Tarea';
+        toggleBtn.className = 'modal-btn modal-btn-outline';
+      } else {
+        statusBadge.textContent = '⏳ Pendiente';
+        statusBadge.style.background = 'rgba(237,137,54,0.15)';
+        statusBadge.style.color = 'var(--accent-orange)';
+        toggleBtn.textContent = '✓ Marcar como Completada';
+        toggleBtn.className = 'modal-btn modal-btn-success';
+      }
+    }
+
+    function toggleTaskFromModal() {
+      if (currentModalIdx === null) return;
+      if (completedTasks.has(currentModalIdx)) {
+        completedTasks.delete(currentModalIdx);
+      } else {
+        completedTasks.add(currentModalIdx);
+      }
+      TaskStore.saveCompleted(completedTasks);
+      updateModalStatus(currentModalIdx);
+      renderTasks();
+    }
+
+    function closeTaskModal() {
+      document.getElementById('taskModalBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
+      currentModalIdx = null;
+    }
+
+    function handleBackdropClick(event) {
+      if (event.target === document.getElementById('taskModalBackdrop')) {
+        closeTaskModal();
+      }
+    }
+
+    function copyTaskSteps() {
+      if (currentModalIdx === null) return;
+      const task = TASKS[currentModalIdx];
+      let md = `# [Feature ${task.feature}] ${task.text}\n\n`;
+      md += `**Fase:** ${task.phase}\n`;
+      md += `**Responsable:** ${task.dev_name || 'Dev ' + task.dev}\n\n`;
+      md += `## Descripción\n${task.desc}\n\n`;
+      md += `## Guía Paso a Paso\n`;
+      task.steps.forEach((step, i) => {
+        md += `${i + 1}. ${step}\n`;
+      });
+      md += `\n## Archivos Involucrados\n`;
+      task.files.forEach(f => {
+        md += `- ${f}\n`;
+      });
+      md += `\n## Entregable Esperado\n${task.deliverable}\n`;
+
+      navigator.clipboard.writeText(md).then(() => {
+        alert('¡Guía técnica copiada al portapapeles en formato Markdown!');
+      }).catch(() => {
+        prompt('Copia el contenido:', md);
+      });
+    }
+
+    // Escape key listener for modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && currentModalIdx !== null) {
+        closeTaskModal();
+      }
+    });
+
+    // ===== FILTERS =====
+    document.querySelectorAll('.task-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.task-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderTasks();
+      });
+    });
+
+    // ===== NAV SCROLL PROGRESS =====
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      document.getElementById('navProgress').style.width = percent + '%';
+
+      // Active nav link
+      const sections = document.querySelectorAll('section[id]');
+      let current = '';
+      sections.forEach(section => {
+        const top = section.offsetTop - 100;
+        if (scrollTop >= top) current = section.id;
+      });
+      document.querySelectorAll('.nav-links a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+    });
+
+    // ===== SERVICE WORKER & PWA INSTALL =====
+    let deferredPrompt = null;
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => {
+            console.log('[PWA] Service Worker registrado exitosamente en:', reg.scope);
+          })
+          .catch(err => {
+            console.warn('[PWA] Error al registrar Service Worker:', err);
+          });
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('installPwaBtn');
+      if (installBtn) installBtn.style.display = 'inline-flex';
+    });
+
+    function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('[PWA] Instalación aceptada por el usuario');
+          }
+          deferredPrompt = null;
+          const installBtn = document.getElementById('installPwaBtn');
+          if (installBtn) installBtn.style.display = 'none';
+        });
+      } else {
+        alert('Para instalar Flyvest:\n• En Chrome/Edge: Pulsa el icono ⊕ de instalación en la barra de direcciones.\n• En iOS: Pulsa "Compartir" y luego "Agregar al inicio".');
+      }
+    }
+
+    // ===== ONLINE / OFFLINE STATUS =====
+    function updateOnlineStatus() {
+      const badge = document.getElementById('pwaStatusBadge');
+      if (!badge) return;
+      if (navigator.onLine) {
+        badge.className = 'pwa-status-badge online';
+        badge.innerHTML = '<span class="status-dot"></span> <span class="status-text">Online</span>';
+        badge.title = 'Conectado a la red — Sincronización activa';
+      } else {
+        badge.className = 'pwa-status-badge offline';
+        badge.innerHTML = '<span class="status-dot"></span> <span class="status-text">Offline (Caché)</span>';
+        badge.title = 'Modo sin conexión — Los cambios se guardan localmente en caché';
+      }
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    // ===== INIT =====
+    renderTasks();
+    TaskStore.restoreFromCacheIfAvailable();
+  </script>
+</body>
+</html>
