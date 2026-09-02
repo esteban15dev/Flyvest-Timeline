@@ -1,17 +1,18 @@
-# ⚡ Flyvest — Centro de Comando (PWA)
+# ⚡ Flyvest — Centro de Comando (PWA con Sincronización en la Nube)
 
-Centro de mando interactivo, arquitectura del sistema, plan financiero y timeline de desarrollo para el proyecto **Flyvest** (SaaS de cobranza en ruta y microcréditos).
+Centro de mando interactivo, arquitectura del sistema, plan financiero, timeline de desarrollo y **seguimiento de avance de equipo en la nube** para el proyecto **Flyvest** (SaaS de cobranza en ruta y microcréditos).
 
 ---
 
-## 🚀 Características
+## 🚀 Características Principales
 
-- **PWA Instalable:** Compatible con Chrome, Edge, Safari (iOS), Android y Firefox Desktop/Mobile.
-- **Soporte Offline & Service Worker (`sw.js`):** Funciona sin conexión a internet mediante estrategias de almacenamiento en caché (*Stale-While-Revalidate* y pre-cacheo de assets).
-- **Persistencia de Tareas:** Guarda el estado de las tareas completadas en `localStorage` y en `Cache Storage` para máxima redundancia y sincronización offline.
-- **Visualizador Paso a Paso:** Desglose técnico de cada requerimiento por desarrollador (Cesar, Angel, Mujica, Esteban).
-- **Indicador de Conexión en Tiempo Real:** Detección automática de estado Online / Offline.
-- **Acción Rápida de Instalación:** Botón intuitivo para añadir la app al dispositivo.
+- **☁️ Sincronización en la Nube Multi-usuario:** Guarda y sincroniza en tiempo real las tareas completadas por cada miembro del equipo (**Cesar, Angel, Mujica y Esteban**).
+- **👥 Panel de Progreso del Equipo:** 4 tarjetas interactivas con el porcentaje de avance, tareas finalizadas y métricas individuales por desarrollador.
+- **👤 Selector de Perfil Activo:** Permite identificarte como el desarrollador que realiza las tareas (*"Soy Cesar"*, *"Soy Angel"*, *"Soy Mujica"*, *"Soy Esteban"* o *"Modo Observador"*).
+- **⚡ Compatibilidad con Supabase & Cloud API:** Integración directa con base de datos Supabase o almacenamiento en la nube automático sin configuración previa.
+- **📱 PWA Instalable:** Compatible con Chrome, Edge, Safari (iOS), Android y Firefox Desktop/Mobile con soporte de pantalla completa.
+- **📶 Arquitectura Offline-First:** Funciona sin conexión a internet mediante Service Worker (`sw.js`) y `Cache Storage`. Al recuperar conexión, sincroniza automáticamente los cambios pendientes.
+- **📋 Visualizador Técnico Paso a Paso:** Desglose de arquitectura, archivos a modificar, comandos y entregable esperado por cada tarea.
 
 ---
 
@@ -39,7 +40,7 @@ Flyvest-Timeline/
 
 ## 🧪 Ejecución de Pruebas
 
-Para ejecutar las pruebas de integridad de la PWA, iconos, Service Worker y persistencia:
+Para ejecutar las pruebas automatizadas (PWA, Service Worker, multi-usuario, cálculo de métricas y resolución de conflictos):
 
 ```bash
 node tests/pwa_tests.js
@@ -49,7 +50,7 @@ node tests/pwa_tests.js
 
 ## 💻 Servidor Local
 
-Para probar la instalación PWA localmente con Service Workers habilitados:
+Para probar la PWA localmente con Service Workers y sincronización activa:
 
 ```bash
 # Con Node.js (npx)

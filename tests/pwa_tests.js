@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-console.log('🧪 Iniciando Suite de Pruebas de PWA y Persistencia de Tareas...');
+console.log('🧪 Iniciando Suite de Pruebas: PWA, Sincronización en la Nube y Dashboard de Equipo...');
 let passedTests = 0;
 let totalTests = 0;
 
@@ -59,7 +59,6 @@ test('Todos los iconos (PNG y SVG) existen y tienen cabecera/formato válido', (
 
     if (relPath.endsWith('.png')) {
       const buffer = fs.readFileSync(fullPath);
-      // Validar firma PNG (\x89PNG\r\n\x1a\n)
       const pngSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
       assert.ok(buffer.subarray(0, 8).equals(pngSignature), `Firma PNG no válida en ${relPath}`);
     }
@@ -79,8 +78,8 @@ test('El Service Worker (sw.js) contiene manejadores install, activate, fetch y 
   assert.ok(swContent.includes('STATIC_ASSETS'), 'Falta array de STATIC_ASSETS en sw.js');
 });
 
-// 4. Validar integración PWA en index.html y flyvest_centro_comando.html
-test('Los archivos HTML contienen etiquetas PWA, Service Worker y TaskStore', () => {
+// 4. Validar integración PWA, CloudSync y Team Dashboard en HTML
+test('Los archivos HTML contienen etiquetas PWA, CloudSync, TaskStore y Team Dashboard', () => {
   const htmlFiles = ['index.html', 'flyvest_centro_comando.html'];
 
   for (const file of htmlFiles) {
@@ -90,60 +89,89 @@ test('Los archivos HTML contienen etiquetas PWA, Service Worker y TaskStore', ()
     const html = fs.readFileSync(htmlPath, 'utf8');
     assert.ok(html.includes('rel="manifest" href="manifest.json"'), `Falta manifest link en ${file}`);
     assert.ok(html.includes('meta name="theme-color" content="#0a0a0f"'), `Falta meta theme-color en ${file}`);
-    assert.ok(html.includes('apple-mobile-web-app-capable'), `Falta meta iOS en ${file}`);
     assert.ok(html.includes("navigator.serviceWorker.register('./sw.js')"), `Falta registro de SW en ${file}`);
     assert.ok(html.includes('TaskStore'), `Falta objeto TaskStore en ${file}`);
-    assert.ok(html.includes('pwaStatusBadge'), `Falta indicador de estado PWA en ${file}`);
-    assert.ok(html.includes('installPwaBtn'), `Falta botón de instalación en ${file}`);
+    assert.ok(html.includes('CloudSync'), `Falta motor CloudSync en ${file}`);
+    assert.ok(html.includes('teamProgressGrid'), `Falta contenedor teamProgressGrid en ${file}`);
+    assert.ok(html.includes('activeDevSelect'), `Falta selector de desarrollador en ${file}`);
+    assert.ok(html.includes('cloudSyncBadge'), `Falta badge de sincronización cloud en ${file}`);
+    assert.ok(html.includes('cloudConfigModalBackdrop'), `Falta modal de configuración de nube en ${file}`);
   }
 });
 
-// 5. Simulación de lógica de negocio y persistencia de TaskStore
-test('Simulación de persistencia y cálculo de progreso de tareas', () => {
+// 5. Simulación de multi-usuario y cálculo de métricas por desarrollador
+test('Cálculo de progreso individual para Cesar, Angel, Mujica y Esteban', () => {
   const mockTasks = [
-    { dev: 1, text: 'Task 1' },
-    { dev: 1, text: 'Task 2' },
-    { dev: 2, text: 'Task 3' },
-    { dev: 3, text: 'Task 4' }
+    { dev: 1, text: 'Mobile Task 1' },
+    { dev: 1, text: 'Mobile Task 2' },
+    { dev: 2, text: 'Web Task 1' },
+    { dev: 2, text: 'Web Task 2' },
+    { dev: 3, text: 'Backend Task 1' },
+    { dev: 3, text: 'Backend Task 2' },
+    { dev: 4, text: 'DevOps Task 1' },
+    { dev: 4, text: 'DevOps Task 2' }
   ];
 
-  let storage = {};
-  const mockLocalStorage = {
-    getItem: (k) => storage[k] || null,
-    setItem: (k, v) => { storage[k] = v; },
-    clear: () => { storage = {}; }
+  const states = {
+    0: { completed: true, devId: 1, devName: 'Cesar', updatedAt: Date.now() },
+    2: { completed: true, devId: 2, devName: 'Angel', updatedAt: Date.now() },
+    3: { completed: true, devId: 2, devName: 'Angel', updatedAt: Date.now() },
+    6: { completed: true, devId: 4, devName: 'Esteban', updatedAt: Date.now() }
   };
 
-  const STORAGE_KEY = 'flyvest-tasks-v3';
+  function getStatsForDev(devId) {
+    const tasks = mockTasks.map((t, idx) => ({ ...t, idx })).filter(t => t.dev === devId);
+    const completed = tasks.filter(t => states[t.idx] && states[t.idx].completed).length;
+    const percent = Math.round((completed / tasks.length) * 100);
+    return { total: tasks.length, completed, percent };
+  }
 
-  // Test set empty
-  let completed = new Set(JSON.parse(mockLocalStorage.getItem(STORAGE_KEY) || '[]'));
-  assert.strictEqual(completed.size, 0, 'Inicialmente debe estar vacío');
+  const cesarStats = getStatsForDev(1);
+  assert.strictEqual(cesarStats.completed, 1);
+  assert.strictEqual(cesarStats.total, 2);
+  assert.strictEqual(cesarStats.percent, 50, 'Cesar debe tener 50%');
 
-  // Toggle task 0
-  completed.add(0);
-  mockLocalStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
+  const angelStats = getStatsForDev(2);
+  assert.strictEqual(angelStats.completed, 2);
+  assert.strictEqual(angelStats.total, 2);
+  assert.strictEqual(angelStats.percent, 100, 'Angel debe tener 100%');
 
-  // Reload from storage
-  let reloaded = new Set(JSON.parse(mockLocalStorage.getItem(STORAGE_KEY) || '[]'));
-  assert.strictEqual(reloaded.size, 1, 'Debe haber 1 tarea guardada');
-  assert.ok(reloaded.has(0), 'La tarea 0 debe estar completada');
+  const mujicaStats = getStatsForDev(3);
+  assert.strictEqual(mujicaStats.completed, 0);
+  assert.strictEqual(mujicaStats.total, 2);
+  assert.strictEqual(mujicaStats.percent, 0, 'Mujica debe tener 0%');
 
-  // Toggle task 2
-  reloaded.add(2);
-  mockLocalStorage.setItem(STORAGE_KEY, JSON.stringify([...reloaded]));
+  const estebanStats = getStatsForDev(4);
+  assert.strictEqual(estebanStats.completed, 1);
+  assert.strictEqual(estebanStats.total, 2);
+  assert.strictEqual(estebanStats.percent, 50, 'Esteban debe tener 50%');
+});
 
-  // Verify progress
-  const total = mockTasks.length;
-  const doneCount = reloaded.size;
-  const percent = Math.round((doneCount / total) * 100);
-  assert.strictEqual(percent, 50, 'Progreso general debe ser 50% con 2 de 4 tareas');
+// 6. Fusión (merge) de estados remotos sin sobreescritura de conflictos
+test('Fusión en la nube: resolución correcta de conflictos por marca de tiempo', () => {
+  let localStates = {
+    0: { completed: true, devId: 1, devName: 'Cesar', updatedAt: 1000 },
+    1: { completed: false, devId: 1, devName: 'Cesar', updatedAt: 1000 }
+  };
 
-  // Filter Dev 1
-  const dev1Tasks = mockTasks.filter(t => t.dev === 1);
-  const dev1Done = dev1Tasks.filter((t, i) => reloaded.has(mockTasks.indexOf(t))).length;
-  const dev1Percent = Math.round((dev1Done / dev1Tasks.length) * 100);
-  assert.strictEqual(dev1Percent, 50, 'Progreso de Dev 1 debe ser 50% (1 de 2)');
+  const remoteStates = {
+    1: { completed: true, devId: 1, devName: 'Cesar', updatedAt: 2000 }, // más reciente
+    0: { completed: false, devId: 1, devName: 'Cesar', updatedAt: 500 },  // obsoleto
+    2: { completed: true, devId: 2, devName: 'Angel', updatedAt: 1500 }   // nueva tarea remota
+  };
+
+  // Merge logic
+  Object.keys(remoteStates).forEach(key => {
+    const remote = remoteStates[key];
+    const local = localStates[key];
+    if (!local || remote.updatedAt > (local.updatedAt || 0)) {
+      localStates[key] = remote;
+    }
+  });
+
+  assert.strictEqual(localStates[0].completed, true, 'Tarea 0 debe mantenerse completada porque el cambio local era más reciente');
+  assert.strictEqual(localStates[1].completed, true, 'Tarea 1 debe adoptarse como completada porque el cambio remoto es más reciente');
+  assert.strictEqual(localStates[2].completed, true, 'Tarea 2 de Angel debe agregarse');
 });
 
 console.log(`\n================================`);

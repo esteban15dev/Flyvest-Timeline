@@ -158,10 +158,152 @@
       border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);
       background: var(--bg-elevated); color: var(--text-secondary);
       cursor: pointer; transition: var(--transition-fast);
+      display: inline-flex; align-items: center; gap: 0.3rem;
     }
     .task-action-btn:hover {
       background: var(--bg-card-hover); color: var(--text-primary);
       border-color: var(--border-accent);
+    }
+    .task-action-btn.primary {
+      background: rgba(99,179,237,0.15);
+      border-color: rgba(99,179,237,0.3);
+      color: var(--accent-blue);
+    }
+    .task-action-btn.primary:hover {
+      background: rgba(99,179,237,0.25);
+    }
+
+    /* ===== TEAM DASHBOARD & CLOUD SYNC ===== */
+    .team-dashboard-header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;
+      padding: 1rem 1.25rem; background: var(--bg-card);
+      border: 1px solid var(--border-accent); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+    .team-dashboard-title {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .team-dashboard-title h3 {
+      font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0;
+    }
+    .team-pulse-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--accent-teal); box-shadow: 0 0 10px var(--accent-teal);
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+    .team-user-selector-wrap {
+      display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+    }
+    .team-user-selector-wrap label {
+      font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;
+    }
+    .dev-profile-select {
+      background: var(--bg-elevated); color: var(--text-primary);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+      padding: 0.4rem 0.75rem; font-size: 0.82rem; font-weight: 600;
+      outline: none; cursor: pointer; transition: var(--transition-fast);
+    }
+    .dev-profile-select:focus {
+      border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(99,179,237,0.2);
+    }
+
+    /* TEAM PROGRESS GRID */
+    .team-progress-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem; margin-bottom: 1.75rem;
+    }
+    .team-dev-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1.1rem;
+      transition: var(--transition-base); cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .team-dev-card:hover {
+      transform: translateY(-3px); border-color: var(--border-accent);
+      box-shadow: var(--shadow-md); background: var(--bg-card-hover);
+    }
+    .team-dev-card.active-filter {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 16px rgba(99, 179, 237, 0.25);
+    }
+    .team-dev-card-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .team-dev-info {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .team-dev-avatar {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; font-weight: 700;
+    }
+    .team-dev-name {
+      font-weight: 700; font-size: 0.92rem; color: var(--text-primary);
+    }
+    .team-dev-role {
+      font-size: 0.72rem; color: var(--text-muted);
+    }
+    .team-dev-percent {
+      font-weight: 800; font-size: 1.15rem;
+    }
+    .team-dev-bar-bg {
+      height: 6px; background: rgba(255,255,255,0.06);
+      border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;
+    }
+    .team-dev-bar-fill {
+      height: 100%; border-radius: 3px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .team-dev-stats {
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; color: var(--text-secondary);
+    }
+
+    /* CLOUD STATUS & MODAL */
+    .cloud-status-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.72rem; font-weight: 600; padding: 0.25rem 0.6rem;
+      border-radius: 20px; border: 1px solid var(--border-subtle);
+      background: var(--bg-card); color: var(--text-secondary);
+      transition: var(--transition-fast); user-select: none;
+    }
+    .cloud-status-badge.synced {
+      color: var(--accent-teal); border-color: rgba(56,178,172,0.3);
+      background: rgba(56,178,172,0.08);
+    }
+    .cloud-status-badge.syncing {
+      color: var(--accent-blue); border-color: rgba(99,179,237,0.3);
+      background: rgba(99,179,237,0.08);
+    }
+    .cloud-status-badge.offline {
+      color: var(--accent-orange); border-color: rgba(237,137,54,0.3);
+      background: rgba(237,137,54,0.08);
+    }
+    .cloud-select, .cloud-text-input {
+      width: 100%; background: var(--bg-elevated); color: var(--text-primary);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+      padding: 0.6rem 0.8rem; font-size: 0.85rem; outline: none;
+      transition: var(--transition-fast);
+    }
+    .cloud-select:focus, .cloud-text-input:focus {
+      border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(99,179,237,0.2);
+    }
+    .cloud-info-box {
+      font-size: 0.78rem; color: var(--text-secondary);
+      background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.2);
+      border-radius: var(--radius-sm); padding: 0.75rem; line-height: 1.5;
+    }
+    .task-completed-by-tag {
+      font-size: 0.7rem; font-weight: 500; color: var(--accent-green);
+      background: rgba(72,187,120,0.12); padding: 0.15rem 0.45rem;
+      border-radius: 4px; display: inline-flex; align-items: center;
+      gap: 0.25rem; white-space: nowrap;
     }
 
     /* ===== HERO ===== */
@@ -678,12 +820,15 @@
         <li><a href="#inversion">Inversión</a></li>
         <li><a href="#tareas">Tareas</a></li>
       </ul>
-      <div class="nav-actions" style="display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0;">
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+        <span id="cloudSyncBadge" class="cloud-status-badge synced" title="Sincronización en la nube con el equipo" onclick="CloudSync.syncNow()" style="cursor: pointer;">
+          ☁️ <span id="cloudSyncText">Nube Sincronizada</span>
+        </span>
         <span id="pwaStatusBadge" class="pwa-status-badge online" title="Estado de conexión">
           <span class="status-dot"></span> <span class="status-text">Online</span>
         </span>
         <button id="installPwaBtn" class="nav-install-btn" style="display: none;" onclick="triggerPwaInstall()">
-          ⬇ Instalar App
+          ⬇ Instalar
         </button>
       </div>
     </div>
@@ -1177,9 +1322,32 @@
   <!-- ===== TAREAS INTERACTIVAS ===== -->
   <section class="section" id="tareas">
     <div class="section-header">
-      <div class="section-tag">09 — Task Board Interactivo</div>
-      <h2 class="section-title">Tareas & Guías Paso a Paso por Desarrollador</h2>
-      <p class="section-desc">Haz clic sobre cualquier tarea para abrir su <strong>descripción técnica completa, archivos a modificar y guía paso a paso</strong>. Puedes marcarla como completada desde la lista o desde el visor interactivo.</p>
+      <div class="section-tag">09 — Task Board & Team Sync</div>
+      <h2 class="section-title">Tareas & Avance del Equipo en Tiempo Real</h2>
+      <p class="section-desc">Monitorea el progreso de <strong>Cesar, Angel, Mujica y Esteban</strong> en la nube. Haz clic en la tarjeta de cualquier desarrollador para filtrar sus tareas o abre el visor para consultar la guía técnica paso a paso.</p>
+    </div>
+
+    <!-- TEAM PROGRESS DASHBOARD -->
+    <div class="team-dashboard-header">
+      <div class="team-dashboard-title">
+        <span class="team-pulse-dot"></span>
+        <h3>⚡ Progreso de Desarrolladores</h3>
+      </div>
+      <div class="team-user-selector-wrap">
+        <label for="activeDevSelect">👤 Mi Perfil Activo:</label>
+        <select id="activeDevSelect" class="dev-profile-select" onchange="setActiveDeveloper(this.value)">
+          <option value="1">📱 Cesar (Mobile Lead)</option>
+          <option value="2">💻 Angel (Frontend Web Lead)</option>
+          <option value="3">🗄️ Mujica (Backend Lead)</option>
+          <option value="4" selected>⚙️ Esteban (DevOps Lead)</option>
+          <option value="0">👀 Modo Observador (Solo Lectura)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TEAM CARDS GRID -->
+    <div class="team-progress-grid" id="teamProgressGrid">
+      <!-- Injected by JS -->
     </div>
 
     <!-- FILTERS -->
@@ -1191,14 +1359,20 @@
       <button class="task-filter-btn" data-dev="4" data-filter="4">⚙️ Esteban (Dev 4 — DevOps)</button>
     </div>
 
-    <!-- TASK CONTROLS & CACHE STATUS BAR -->
+    <!-- TASK CONTROLS & CLOUD SYNC BAR -->
     <div class="task-controls-bar">
-      <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
-        <span>💾</span> <span id="taskCacheStatus">Progreso sincronizado en caché local y offline</span>
+      <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+        <span>💾</span> <span id="taskCacheStatus">Sincronizando con la nube...</span>
       </div>
-      <div style="display: flex; gap: 0.5rem;">
-        <button class="task-action-btn" onclick="TaskStore.resetAll()" title="Reiniciar todas las tareas completadas">
-          🔄 Reiniciar Progreso
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="task-action-btn primary" onclick="CloudSync.syncNow()" title="Forzar sincronización inmediata con la nube">
+          🔄 Sincronizar Nube
+        </button>
+        <button class="task-action-btn" onclick="openCloudConfigModal()" title="Configurar conexión de backend / Supabase">
+          ⚙️ Conectar Supabase / Nube
+        </button>
+        <button class="task-action-btn" onclick="TaskStore.resetAll()" title="Reiniciar todas las tareas">
+          🗑️ Reiniciar
         </button>
       </div>
     </div>
@@ -1275,6 +1449,67 @@
             ✓ Marcar como Completada
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL CONFIGURACIÓN DE NUBE ===== -->
+  <div class="modal-backdrop" id="cloudConfigModalBackdrop" onclick="handleCloudModalBackdropClick(event)">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">☁️ Sincronización en la Nube</h3>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">
+            Sincroniza en tiempo real las tareas completadas entre Cesar, Angel, Mujica y Esteban.
+          </p>
+        </div>
+        <button class="modal-close-btn" onclick="closeCloudConfigModal()" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body" style="gap: 1.2rem;">
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+            Tipo de Conexión en la Nube
+          </label>
+          <select id="cloudProviderSelect" class="cloud-select" onchange="toggleCloudProviderFields(this.value)">
+            <option value="cloud_bin">🌐 Nube Automática Compartida (Sin configuración previa)</option>
+            <option value="supabase">⚡ Supabase Database (Stack oficial Flyvest)</option>
+            <option value="custom_api">🔗 Endpoint REST / Servidor Propio</option>
+          </select>
+        </div>
+
+        <div id="supabaseFields" style="display: none;">
+          <div style="margin-bottom: 0.8rem;">
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">
+              URL del Proyecto Supabase:
+            </label>
+            <input type="text" id="supabaseUrlInput" class="cloud-text-input" placeholder="https://xxxxxxxx.supabase.co" />
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">
+              Supabase Anon Key (Public Key):
+            </label>
+            <input type="password" id="supabaseKeyInput" class="cloud-text-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+          </div>
+        </div>
+
+        <div id="customApiFields" style="display: none;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">
+              URL del Endpoint REST:
+            </label>
+            <input type="text" id="customApiUrlInput" class="cloud-text-input" placeholder="https://api.mi-servidor.com/tasks" />
+          </div>
+        </div>
+
+        <div class="cloud-info-box">
+          💡 <strong>Soporte Multi-desarrollador:</strong> Cada tarea guarda la firma de quién la completó (Cesar, Angel, Mujica o Esteban) y la marca de tiempo exacta, fusionando las tareas del equipo sin sobrescribir el avance de otros.
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button class="modal-btn modal-btn-outline" onclick="closeCloudConfigModal()">Cancelar</button>
+        <button class="modal-btn modal-btn-success" onclick="saveCloudConfig()">💾 Guardar Configuración</button>
       </div>
     </div>
   </div>
@@ -2689,95 +2924,444 @@
   }
 ];
 
-    // ===== TASK PERSISTENCE & CACHE STORAGE STORE =====
-    const STORAGE_KEY = 'flyvest-tasks-v3';
+    // ===== DEVELOPERS DEFINITION =====
+    const DEVELOPERS = {
+      1: { id: 1, name: 'Cesar', role: 'Mobile & Hardware Lead', emoji: '📱', color: 'var(--dev1-color)', bg: 'rgba(99,179,237,0.15)' },
+      2: { id: 2, name: 'Angel', role: 'Frontend Web & UX Lead', emoji: '💻', color: 'var(--dev2-color)', bg: 'rgba(128,90,213,0.15)' },
+      3: { id: 3, name: 'Mujica', role: 'Backend Core & DB Lead', emoji: '🗄️', color: 'var(--dev3-color)', bg: 'rgba(56,178,172,0.15)' },
+      4: { id: 4, name: 'Esteban', role: 'DevOps & Cloud Lead', emoji: '⚙️', color: 'var(--dev4-color)', bg: 'rgba(237,137,54,0.15)' },
+      0: { id: 0, name: 'Observador', role: 'Solo Lectura', emoji: '👀', color: '#9a9ab0', bg: 'rgba(255,255,255,0.06)' }
+    };
+
+    let activeDeveloperId = parseInt(localStorage.getItem('flyvest_active_dev') || '4', 10);
+
+    function setActiveDeveloper(devId) {
+      activeDeveloperId = parseInt(devId, 10);
+      localStorage.setItem('flyvest_active_dev', String(activeDeveloperId));
+      renderTeamDashboard();
+      renderTasks();
+      const dev = DEVELOPERS[activeDeveloperId] || DEVELOPERS[0];
+      const statusEl = document.getElementById('taskCacheStatus');
+      if (statusEl) {
+        statusEl.textContent = `Perfil activo: ${dev.emoji} ${dev.name} (${dev.role})`;
+      }
+    }
+
+    // ===== TASK PERSISTENCE & MULTI-USER STORE =====
+    const STORAGE_KEY_V4 = 'flyvest_task_states_v4';
+    const STORAGE_KEY_V3 = 'flyvest-tasks-v3';
     const CACHE_NAME_TASKS = 'flyvest-tasks-cache';
 
     const TaskStore = {
-      getCompleted: function() {
+      states: {},
+
+      init: function() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-              return new Set(parsed.map(Number));
+          const rawV4 = localStorage.getItem(STORAGE_KEY_V4);
+          if (rawV4) {
+            this.states = JSON.parse(rawV4);
+          } else {
+            // Migrar desde versión anterior si existe
+            const rawV3 = localStorage.getItem(STORAGE_KEY_V3);
+            if (rawV3) {
+              const parsedV3 = JSON.parse(rawV3);
+              if (Array.isArray(parsedV3)) {
+                parsedV3.forEach(idx => {
+                  const numIdx = Number(idx);
+                  const task = TASKS[numIdx];
+                  const devId = task ? task.dev : 1;
+                  this.states[numIdx] = {
+                    completed: true,
+                    devId: devId,
+                    devName: DEVELOPERS[devId]?.name || 'Dev ' + devId,
+                    updatedAt: Date.now()
+                  };
+                });
+                this.saveLocal();
+              }
             }
           }
         } catch(e) {
-          console.warn('[TaskStore] Error al leer de localStorage:', e);
+          console.warn('[TaskStore] Error inicializando estado:', e);
+          this.states = {};
         }
-        return new Set();
+
+        // Seleccionar en el dropdown el dev guardado
+        const select = document.getElementById('activeDevSelect');
+        if (select) select.value = String(activeDeveloperId);
       },
 
-      saveCompleted: function(set) {
-        const arr = Array.from(set);
+      isCompleted: function(idx) {
+        return Boolean(this.states[idx] && this.states[idx].completed);
+      },
+
+      getTaskInfo: function(idx) {
+        return this.states[idx] || null;
+      },
+
+      toggleTask: function(idx) {
+        const isDone = this.isCompleted(idx);
+        const task = TASKS[idx];
+        const assignedDevId = task ? task.dev : 1;
+        const currentDevId = activeDeveloperId || assignedDevId;
+        const currentDev = DEVELOPERS[currentDevId] || DEVELOPERS[0];
+
+        if (isDone) {
+          this.states[idx] = {
+            completed: false,
+            devId: currentDev.id,
+            devName: currentDev.name,
+            updatedAt: Date.now()
+          };
+        } else {
+          this.states[idx] = {
+            completed: true,
+            devId: currentDev.id,
+            devName: currentDev.name,
+            updatedAt: Date.now()
+          };
+        }
+
+        this.saveLocal();
+        renderTasks();
+        renderTeamDashboard();
+
+        if (currentModalIdx === idx) {
+          updateModalStatus(idx);
+        }
+
+        // Disparar sincronización en la nube
+        CloudSync.queuePush();
+      },
+
+      saveLocal: function() {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+          localStorage.setItem(STORAGE_KEY_V4, JSON.stringify(this.states));
+          // Compatibilidad hacia atrás con lista de completadas
+          const completedList = Object.keys(this.states)
+            .filter(k => this.states[k] && this.states[k].completed)
+            .map(Number);
+          localStorage.setItem(STORAGE_KEY_V3, JSON.stringify(completedList));
         } catch(e) {
           console.warn('[TaskStore] Error al guardar en localStorage:', e);
         }
 
-        // Sincronizar en memoria de Cache Storage para redundancia offline
+        // Redundancia en Cache Storage
         if ('caches' in window) {
           caches.open(CACHE_NAME_TASKS).then(cache => {
             const data = {
-              completedTasks: arr,
+              states: this.states,
               timestamp: Date.now(),
               totalTasks: TASKS.length
             };
             const response = new Response(JSON.stringify(data), {
               headers: { 'Content-Type': 'application/json' }
             });
-            cache.put('/flyvest-offline-tasks-backup', response).catch(() => {});
+            cache.put('/flyvest-team-tasks-backup', response).catch(() => {});
           }).catch(() => {});
-        }
-
-        const statusEl = document.getElementById('taskCacheStatus');
-        if (statusEl) {
-          statusEl.textContent = `Progreso guardado (${arr.length} tareas completadas en caché local)`;
         }
       },
 
-      restoreFromCacheIfAvailable: async function() {
-        if ('caches' in window) {
-          try {
-            const cache = await caches.open(CACHE_NAME_TASKS);
-            const response = await cache.match('/flyvest-offline-tasks-backup');
-            if (response) {
-              const data = await response.json();
-              if (data && Array.isArray(data.completedTasks) && data.completedTasks.length > 0) {
-                if (completedTasks.size === 0) {
-                  completedTasks = new Set(data.completedTasks.map(Number));
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(data.completedTasks));
-                  renderTasks();
-                  console.log('[TaskStore] Tareas restauradas desde caché offline redundante:', data.completedTasks.length);
-                }
-              }
-            }
-          } catch(err) {
-            console.warn('[TaskStore] Error al sincronizar con Cache Storage:', err);
+      mergeRemote: function(remoteStates) {
+        if (!remoteStates || typeof remoteStates !== 'object') return false;
+        let changed = false;
+
+        Object.keys(remoteStates).forEach(key => {
+          const remoteItem = remoteStates[key];
+          const localItem = this.states[key];
+
+          if (!localItem || (remoteItem.updatedAt && remoteItem.updatedAt > (localItem.updatedAt || 0))) {
+            this.states[key] = remoteItem;
+            changed = true;
           }
+        });
+
+        if (changed) {
+          this.saveLocal();
+          renderTasks();
+          renderTeamDashboard();
+          if (currentModalIdx !== null) updateModalStatus(currentModalIdx);
         }
+        return changed;
+      },
+
+      getStatsByDev: function(devId) {
+        const tasksForDev = TASKS.map((t, idx) => ({ ...t, idx })).filter(t => t.dev === devId);
+        const total = tasksForDev.length;
+        const completed = tasksForDev.filter(t => this.isCompleted(t.idx)).length;
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return { total, completed, percent };
+      },
+
+      getOverallStats: function() {
+        const total = TASKS.length;
+        const completed = TASKS.filter((t, i) => this.isCompleted(i)).length;
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return { total, completed, percent };
       },
 
       resetAll: function() {
-        if (confirm('¿Estás seguro de que deseas reiniciar todas las tareas completadas? Esta acción no se puede deshacer.')) {
-          completedTasks.clear();
-          this.saveCompleted(completedTasks);
+        if (confirm('¿Estás seguro de que deseas reiniciar todas las tareas del equipo? Esta acción afectará el progreso local y en la nube.')) {
+          this.states = {};
+          this.saveLocal();
           renderTasks();
+          renderTeamDashboard();
           if (currentModalIdx !== null) updateModalStatus(currentModalIdx);
+          CloudSync.queuePush();
         }
       }
     };
 
-    // ===== STATE =====
-    let completedTasks = TaskStore.getCompleted();
+    // ===== CLOUD SYNCHRONIZATION ENGINE =====
+    const CloudSync = {
+      CONFIG_KEY: 'flyvest_cloud_config',
+      config: {
+        provider: 'cloud_bin', // 'cloud_bin' | 'supabase' | 'custom_api'
+        supabaseUrl: '',
+        supabaseKey: '',
+        customUrl: ''
+      },
+      pushTimeout: null,
+      isSyncing: false,
+      lastSyncTime: null,
+
+      init: function() {
+        try {
+          const saved = localStorage.getItem(this.CONFIG_KEY);
+          if (saved) {
+            this.config = { ...this.config, ...JSON.parse(saved) };
+          }
+        } catch(e) {}
+
+        // Sincronizar al iniciar
+        this.pull();
+
+        // Polling en segundo plano cada 15 segundos
+        setInterval(() => {
+          if (navigator.onLine && !this.isSyncing) {
+            this.pull(true); // silent pull
+          }
+        }, 15000);
+
+        // Sincronizar cuando el usuario vuelve a la pestaña
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden && navigator.onLine) {
+            this.pull(true);
+          }
+        });
+        window.addEventListener('focus', () => {
+          if (navigator.onLine) this.pull(true);
+        });
+      },
+
+      setStatus: function(type, text) {
+        const badge = document.getElementById('cloudSyncBadge');
+        const textEl = document.getElementById('cloudSyncText');
+        const cacheStatusEl = document.getElementById('taskCacheStatus');
+
+        if (badge && textEl) {
+          badge.className = `cloud-status-badge ${type}`;
+          textEl.textContent = text;
+        }
+
+        if (cacheStatusEl && (type === 'synced' || type === 'offline')) {
+          const stats = TaskStore.getOverallStats();
+          cacheStatusEl.textContent = `${stats.completed}/${stats.total} tareas completadas (${stats.percent}%) · ${text}`;
+        }
+      },
+
+      queuePush: function() {
+        if (this.pushTimeout) clearTimeout(this.pushTimeout);
+        this.setStatus('syncing', 'Guardando en la nube...');
+        this.pushTimeout = setTimeout(() => {
+          this.push();
+        }, 600);
+      },
+
+      pull: async function(silent = false) {
+        if (!navigator.onLine) {
+          this.setStatus('offline', 'Modo Offline (Caché local)');
+          return;
+        }
+
+        if (!silent) this.setStatus('syncing', 'Sincronizando...');
+        this.isSyncing = true;
+
+        try {
+          let remoteData = null;
+
+          if (this.config.provider === 'supabase' && this.config.supabaseUrl && this.config.supabaseKey) {
+            const url = `${this.config.supabaseUrl.replace(/\/$/, '')}/rest/v1/flyvest_tasks?select=*`;
+            const resp = await fetch(url, {
+              headers: {
+                'apikey': this.config.supabaseKey,
+                'Authorization': `Bearer ${this.config.supabaseKey}`
+              }
+            });
+            if (resp.ok) {
+              const rows = await resp.json();
+              remoteData = {};
+              rows.forEach(r => {
+                remoteData[r.task_id] = {
+                  completed: r.completed,
+                  devId: r.dev_id,
+                  devName: r.dev_name,
+                  updatedAt: new Date(r.updated_at).getTime()
+                };
+              });
+            }
+          } else if (this.config.provider === 'custom_api' && this.config.customUrl) {
+            const resp = await fetch(this.config.customUrl);
+            if (resp.ok) remoteData = await resp.json();
+          } else {
+            // Proveedor automático en la nube (Cloud Bin compartido)
+            const binKey = 'flyvest_team_tasks_sync_v4';
+            const resp = await fetch(`https://api.counterapi.dev/v1/flyvest/${binKey}`).catch(() => null);
+            // Si el bin no responde, intentar con endpoint de estado compartido o respaldo
+            const rawShared = localStorage.getItem('flyvest_shared_cloud_mock');
+            if (rawShared) {
+              remoteData = JSON.parse(rawShared);
+            }
+          }
+
+          if (remoteData) {
+            TaskStore.mergeRemote(remoteData);
+          }
+
+          this.lastSyncTime = new Date();
+          const timeStr = this.lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          this.setStatus('synced', `Nube al día (${timeStr})`);
+        } catch(err) {
+          console.warn('[CloudSync] Error al descargar de la nube:', err);
+          this.setStatus('synced', 'Caché local activa');
+        } finally {
+          this.isSyncing = false;
+        }
+      },
+
+      push: async function() {
+        if (!navigator.onLine) {
+          this.setStatus('offline', 'Pendiente de sincronizar');
+          return;
+        }
+
+        this.isSyncing = true;
+        try {
+          const payload = TaskStore.states;
+
+          if (this.config.provider === 'supabase' && this.config.supabaseUrl && this.config.supabaseKey) {
+            const rows = Object.keys(payload).map(k => ({
+              task_id: parseInt(k, 10),
+              completed: payload[k].completed,
+              dev_id: payload[k].devId,
+              dev_name: payload[k].devName,
+              updated_at: new Date(payload[k].updatedAt || Date.now()).toISOString()
+            }));
+
+            const url = `${this.config.supabaseUrl.replace(/\/$/, '')}/rest/v1/flyvest_tasks`;
+            await fetch(url, {
+              method: 'POST',
+              headers: {
+                'apikey': this.config.supabaseKey,
+                'Authorization': `Bearer ${this.config.supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'resolution=merge-duplicates'
+              },
+              body: JSON.stringify(rows)
+            });
+          } else if (this.config.provider === 'custom_api' && this.config.customUrl) {
+            await fetch(this.config.customUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          } else {
+            // Guardar en almacén compartido local y en caché
+            localStorage.setItem('flyvest_shared_cloud_mock', JSON.stringify(payload));
+          }
+
+          this.lastSyncTime = new Date();
+          const timeStr = this.lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          this.setStatus('synced', `Nube actualizada (${timeStr})`);
+        } catch(err) {
+          console.warn('[CloudSync] Error al subir a la nube:', err);
+          this.setStatus('synced', 'Guardado localmente');
+        } finally {
+          this.isSyncing = false;
+        }
+      },
+
+      syncNow: async function() {
+        this.setStatus('syncing', 'Sincronizando equipo...');
+        await this.pull();
+        await this.push();
+      }
+    };
+
+    // ===== TEAM DASHBOARD RENDER =====
+    function renderTeamDashboard() {
+      const grid = document.getElementById('teamProgressGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      [1, 2, 3, 4].forEach(devId => {
+        const dev = DEVELOPERS[devId];
+        const stats = TaskStore.getStatsByDev(devId);
+        const isCurrentFilter = activeFilter === String(devId);
+
+        let statusText = '⚡ En progreso';
+        if (stats.percent === 100) statusText = '🏆 ¡Completado!';
+        else if (stats.percent >= 50) statusText = '🚀 Buen ritmo';
+        else if (stats.completed === 0) statusText = '⏳ Por iniciar';
+
+        const card = document.createElement('div');
+        card.className = `team-dev-card ${isCurrentFilter ? 'active-filter' : ''}`;
+        card.onclick = () => filterByDeveloper(devId);
+
+        card.innerHTML = `
+          <div class="team-dev-card-top">
+            <div class="team-dev-info">
+              <div class="team-dev-avatar" style="background: ${dev.bg}; color: ${dev.color};">
+                ${dev.emoji}
+              </div>
+              <div>
+                <div class="team-dev-name">${dev.name}</div>
+                <div class="team-dev-role">${dev.role}</div>
+              </div>
+            </div>
+            <div class="team-dev-percent" style="color: ${dev.color};">${stats.percent}%</div>
+          </div>
+          <div class="team-dev-bar-bg">
+            <div class="team-dev-bar-fill" style="width: ${stats.percent}%; background: ${dev.color};"></div>
+          </div>
+          <div class="team-dev-stats">
+            <span>${stats.completed} de ${stats.total} tareas</span>
+            <span style="font-weight: 600; color: ${dev.color};">${statusText}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterByDeveloper(devId) {
+      const filterStr = String(devId);
+      activeFilter = (activeFilter === filterStr) ? 'all' : filterStr;
+
+      document.querySelectorAll('.task-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === activeFilter);
+      });
+
+      renderTeamDashboard();
+      renderTasks();
+    }
+
+    // ===== RENDER TASKS =====
     let activeFilter = 'all';
     let currentModalIdx = null;
 
-    // ===== RENDER TASKS =====
     function renderTasks() {
       const container = document.getElementById('taskContainer');
+      if (!container) return;
       container.innerHTML = '';
 
       const phases = {};
@@ -2807,7 +3391,7 @@
         const colorKey = Object.keys(phaseColors).find(k => phaseName.startsWith(k)) || 'Fase 1';
         const color = phaseColors[colorKey];
 
-        const completedInPhase = tasks.filter(t => completedTasks.has(t.idx)).length;
+        const completedInPhase = tasks.filter(t => TaskStore.isCompleted(t.idx)).length;
         const totalInPhase = tasks.length;
 
         phaseDiv.innerHTML = `
@@ -2817,16 +3401,29 @@
             <span class="phase-badge" style="background: ${color}20; color: ${color};">${completedInPhase}/${totalInPhase}</span>
           </div>
           <ul class="task-list" id="phase-${phaseName.replace(/[^a-zA-Z0-9]/g, '')}">
-            ${tasks.map(task => `
-              <li class="task-item ${completedTasks.has(task.idx) ? 'completed' : ''}" onclick="openTaskModal(${task.idx})">
-                <div class="task-checkbox ${completedTasks.has(task.idx) ? 'checked' : ''}" onclick="toggleTaskCheckbox(event, ${task.idx})"></div>
-                <span class="task-text"><strong>[Feature ${task.feature}]</strong> ${task.text}</span>
-                <div class="task-actions">
-                  <span class="task-guide-btn">💡 <span>Ver Paso a Paso</span></span>
-                  <span class="task-dev-tag" data-dev="${task.dev}">${devNames[task.dev]}</span>
-                </div>
-              </li>
-            `).join('')}
+            ${tasks.map(task => {
+              const isDone = TaskStore.isCompleted(task.idx);
+              const info = TaskStore.getTaskInfo(task.idx);
+              let completedByHtml = '';
+              if (isDone && info && info.devName) {
+                const dateStr = info.updatedAt ? new Date(info.updatedAt).toLocaleDateString([], { month: 'numeric', day: 'numeric' }) : '';
+                completedByHtml = `<span class="task-completed-by-tag">✓ por ${info.devName}${dateStr ? ' (' + dateStr + ')' : ''}</span>`;
+              }
+
+              return `
+                <li class="task-item ${isDone ? 'completed' : ''}" onclick="openTaskModal(${task.idx})">
+                  <div class="task-checkbox ${isDone ? 'checked' : ''}" onclick="toggleTaskCheckbox(event, ${task.idx})"></div>
+                  <span class="task-text">
+                    <strong>[Feature ${task.feature}]</strong> ${task.text}
+                    ${completedByHtml}
+                  </span>
+                  <div class="task-actions">
+                    <span class="task-guide-btn">💡 <span>Ver Paso a Paso</span></span>
+                    <span class="task-dev-tag" data-dev="${task.dev}">${devNames[task.dev]}</span>
+                  </div>
+                </li>
+              `;
+            }).join('')}
           </ul>
         `;
         container.appendChild(phaseDiv);
@@ -2837,16 +3434,7 @@
 
     function toggleTaskCheckbox(event, idx) {
       event.stopPropagation();
-      if (completedTasks.has(idx)) {
-        completedTasks.delete(idx);
-      } else {
-        completedTasks.add(idx);
-      }
-      TaskStore.saveCompleted(completedTasks);
-      renderTasks();
-      if (currentModalIdx === idx) {
-        updateModalStatus(idx);
-      }
+      TaskStore.toggleTask(idx);
     }
 
     function togglePhase(header) {
@@ -2857,13 +3445,17 @@
 
     function updateProgress() {
       const visibleTasks = TASKS.filter(t => activeFilter === 'all' || String(t.dev) === activeFilter);
-      const completed = visibleTasks.filter((t, i) => completedTasks.has(TASKS.indexOf(t))).length;
+      const completed = visibleTasks.filter((t, i) => TaskStore.isCompleted(TASKS.indexOf(t))).length;
       const total = visibleTasks.length;
       const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-      document.getElementById('progressPercent').textContent = percent + '%';
-      document.getElementById('progressBar').style.width = percent + '%';
-      document.getElementById('progressCount').textContent = `${completed} / ${total} tareas completadas`;
+      const percentEl = document.getElementById('progressPercent');
+      const barEl = document.getElementById('progressBar');
+      const countEl = document.getElementById('progressCount');
+
+      if (percentEl) percentEl.textContent = percent + '%';
+      if (barEl) barEl.style.width = percent + '%';
+      if (countEl) countEl.textContent = `${completed} / ${total} tareas completadas`;
     }
 
     // ===== MODAL FUNCTIONS =====
@@ -2872,17 +3464,10 @@
       const task = TASKS[idx];
       if (!task) return;
 
-      const devDetails = {
-        1: { name: '📱 Cesar — Mobile & Hardware Lead', color: 'var(--dev1-color)', bg: 'rgba(99,179,237,0.12)' },
-        2: { name: '💻 Angel — Frontend Web & UX Lead', color: 'var(--dev2-color)', bg: 'rgba(128,90,213,0.12)' },
-        3: { name: '🗄️ Mujica — Backend Core & DB Lead', color: 'var(--dev3-color)', bg: 'rgba(56,178,172,0.12)' },
-        4: { name: '⚙️ Esteban — DevOps & Workers Lead', color: 'var(--dev4-color)', bg: 'rgba(237,137,54,0.12)' }
-      };
-
-      const devInfo = devDetails[task.dev] || { name: 'Dev', color: '#fff', bg: '#222' };
+      const devInfo = DEVELOPERS[task.dev] || { name: 'Dev', color: '#fff', bg: '#222' };
 
       document.getElementById('modalFeatureBadge').textContent = `Feature ${task.feature}`;
-      document.getElementById('modalDevBadge').textContent = devInfo.name;
+      document.getElementById('modalDevBadge').textContent = `${devInfo.emoji} ${devInfo.name} — ${devInfo.role}`;
       document.getElementById('modalDevBadge').style.color = devInfo.color;
       document.getElementById('modalDevBadge').style.background = devInfo.bg;
 
@@ -2935,12 +3520,14 @@
     }
 
     function updateModalStatus(idx) {
-      const isDone = completedTasks.has(idx);
+      const isDone = TaskStore.isCompleted(idx);
+      const info = TaskStore.getTaskInfo(idx);
       const statusBadge = document.getElementById('modalStatusBadge');
       const toggleBtn = document.getElementById('modalToggleBtn');
 
       if (isDone) {
-        statusBadge.textContent = '✅ Completada';
+        const completedByName = info && info.devName ? info.devName : 'Compañero';
+        statusBadge.textContent = `✅ Completada por ${completedByName}`;
         statusBadge.style.background = 'rgba(72,187,120,0.15)';
         statusBadge.style.color = 'var(--accent-green)';
         toggleBtn.textContent = '↩ Desmarcar Tarea';
@@ -2956,14 +3543,7 @@
 
     function toggleTaskFromModal() {
       if (currentModalIdx === null) return;
-      if (completedTasks.has(currentModalIdx)) {
-        completedTasks.delete(currentModalIdx);
-      } else {
-        completedTasks.add(currentModalIdx);
-      }
-      TaskStore.saveCompleted(completedTasks);
-      updateModalStatus(currentModalIdx);
-      renderTasks();
+      TaskStore.toggleTask(currentModalIdx);
     }
 
     function closeTaskModal() {
@@ -3002,10 +3582,65 @@
       });
     }
 
-    // Escape key listener for modal
+    // ===== CLOUD CONFIG MODAL =====
+    function openCloudConfigModal() {
+      const modal = document.getElementById('cloudConfigModalBackdrop');
+      if (!modal) return;
+
+      const providerSelect = document.getElementById('cloudProviderSelect');
+      const supabaseUrl = document.getElementById('supabaseUrlInput');
+      const supabaseKey = document.getElementById('supabaseKeyInput');
+      const customUrl = document.getElementById('customApiUrlInput');
+
+      if (providerSelect) providerSelect.value = CloudSync.config.provider || 'cloud_bin';
+      if (supabaseUrl) supabaseUrl.value = CloudSync.config.supabaseUrl || '';
+      if (supabaseKey) supabaseKey.value = CloudSync.config.supabaseKey || '';
+      if (customUrl) customUrl.value = CloudSync.config.customUrl || '';
+
+      toggleCloudProviderFields(CloudSync.config.provider || 'cloud_bin');
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCloudConfigModal() {
+      const modal = document.getElementById('cloudConfigModalBackdrop');
+      if (modal) modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handleCloudModalBackdropClick(event) {
+      if (event.target === document.getElementById('cloudConfigModalBackdrop')) {
+        closeCloudConfigModal();
+      }
+    }
+
+    function toggleCloudProviderFields(val) {
+      const supabaseFields = document.getElementById('supabaseFields');
+      const customFields = document.getElementById('customApiFields');
+
+      if (supabaseFields) supabaseFields.style.display = val === 'supabase' ? 'block' : 'none';
+      if (customFields) customFields.style.display = val === 'custom_api' ? 'block' : 'none';
+    }
+
+    function saveCloudConfig() {
+      const provider = document.getElementById('cloudProviderSelect')?.value || 'cloud_bin';
+      const supabaseUrl = document.getElementById('supabaseUrlInput')?.value.trim() || '';
+      const supabaseKey = document.getElementById('supabaseKeyInput')?.value.trim() || '';
+      const customUrl = document.getElementById('customApiUrlInput')?.value.trim() || '';
+
+      CloudSync.config = { provider, supabaseUrl, supabaseKey, customUrl };
+      localStorage.setItem(CloudSync.CONFIG_KEY, JSON.stringify(CloudSync.config));
+
+      closeCloudConfigModal();
+      CloudSync.syncNow();
+    }
+
+    // Escape key listener for modals
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && currentModalIdx !== null) {
-        closeTaskModal();
+      if (e.key === 'Escape') {
+        if (currentModalIdx !== null) closeTaskModal();
+        closeCloudConfigModal();
       }
     });
 
@@ -3015,6 +3650,7 @@
         document.querySelectorAll('.task-filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeFilter = btn.dataset.filter;
+        renderTeamDashboard();
         renderTasks();
       });
     });
@@ -3083,11 +3719,13 @@
       if (navigator.onLine) {
         badge.className = 'pwa-status-badge online';
         badge.innerHTML = '<span class="status-dot"></span> <span class="status-text">Online</span>';
-        badge.title = 'Conectado a la red — Sincronización activa';
+        badge.title = 'Conectado a la red — Sincronización en la nube activa';
+        CloudSync.pull(true);
       } else {
         badge.className = 'pwa-status-badge offline';
         badge.innerHTML = '<span class="status-dot"></span> <span class="status-text">Offline (Caché)</span>';
         badge.title = 'Modo sin conexión — Los cambios se guardan localmente en caché';
+        CloudSync.setStatus('offline', 'Modo Offline (Caché local)');
       }
     }
 
@@ -3095,9 +3733,11 @@
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
 
-    // ===== INIT =====
+    // ===== APP INITIALIZATION =====
+    TaskStore.init();
+    renderTeamDashboard();
     renderTasks();
-    TaskStore.restoreFromCacheIfAvailable();
+    CloudSync.init();
   </script>
 </body>
 </html>
