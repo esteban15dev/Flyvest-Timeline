@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Flyvest — Centro de Comando del Proyecto</title>
   <meta name="description" content="Resumen ejecutivo, arquitectura, plan financiero y tareas interactivas del proyecto Flyvest para el equipo de 4 desarrolladores de Amplify (Cesar, Angel, Mujica, Esteban) con guías paso a paso." />
   <link rel="manifest" href="manifest.json" />
@@ -20,6 +20,10 @@
   <style>
     /* ===== DESIGN TOKENS ===== */
     :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
       --bg-primary: #0a0a0f;
       --bg-secondary: #111118;
       --bg-card: #16161f;
@@ -55,8 +59,13 @@
       --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ===== RESET ===== */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ===== RESET & MOBILE TOUCH FEEL ===== */
+    *, *::before, *::after { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+    }
     html { scroll-behavior: smooth; font-size: 16px; scroll-padding-top: 80px; }
     body {
       font-family: var(--font-sans);
@@ -65,6 +74,13 @@
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    button, a, .task-item, .team-dev-card, .task-filter-btn {
+      touch-action: manipulation;
+    }
+    button:active, .task-action-btn:active, .task-filter-btn:active, .team-dev-card:active {
+      transform: scale(0.97);
     }
 
     ::-webkit-scrollbar { width: 6px; }
@@ -786,14 +802,328 @@
     .feature-item h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
     .feature-item p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
 
-    /* ===== RESPONSIVE ===== */
+    /* ===== MOBILE BOTTOM DOCK NAVIGATION ===== */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(60px + var(--sab));
+      padding-bottom: var(--sab);
+      background: rgba(10, 10, 15, 0.92);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-top: 1px solid var(--border-subtle);
+      z-index: 1000;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.68rem;
+      font-weight: 600;
+      gap: 3px;
+      flex: 1;
+      height: 100%;
+      transition: var(--transition-fast);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .mobile-nav-item .mobile-nav-icon {
+      font-size: 1.15rem;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+    .mobile-nav-item.active, .mobile-nav-item:active {
+      color: var(--accent-blue);
+    }
+    .mobile-nav-item.active .mobile-nav-icon {
+      transform: scale(1.15);
+    }
+
+    .modal-drag-bar {
+      display: none;
+      width: 40px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 2px;
+      margin: 0.5rem auto 0.75rem;
+    }
+
+    /* ===== RESPONSIVE & MOBILE POLISH ===== */
     @media (max-width: 768px) {
-      .nav-inner { padding: 0 1rem; }
-      .nav-links a { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
-      .hero { padding: 6rem 1rem 2rem; }
-      .section { padding: 2.5rem 1rem; }
-      .modal-meta-grid { grid-template-columns: 1fr; }
-      .task-guide-btn span { display: none; }
+      body {
+        padding-bottom: calc(68px + var(--sab));
+      }
+      .mobile-bottom-nav {
+        display: flex;
+      }
+      .nav-links {
+        display: none !important;
+      }
+      .nav {
+        height: 56px;
+      }
+      .nav-inner {
+        height: 56px;
+        padding: 0 1rem;
+        justify-content: space-between;
+      }
+      .nav-brand {
+        font-size: 1.05rem;
+      }
+      .cloud-status-badge {
+        font-size: 0.68rem;
+        padding: 0.2rem 0.5rem;
+      }
+      .pwa-status-badge {
+        font-size: 0.68rem;
+        padding: 0.2rem 0.5rem;
+      }
+      .nav-install-btn {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.7rem;
+      }
+
+      .hero {
+        padding: 5.5rem 1rem 1.8rem;
+      }
+      .hero h1 {
+        font-size: clamp(1.8rem, 6vw, 2.3rem);
+      }
+      .hero p {
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      /* Stats 2x2 */
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+      }
+      .stat-card {
+        padding: 0.9rem;
+      }
+      .stat-value {
+        font-size: 1.5rem;
+      }
+
+      .section {
+        padding: 2.2rem 1rem;
+      }
+      .section-title {
+        font-size: 1.45rem;
+      }
+      .section-desc {
+        font-size: 0.86rem;
+      }
+
+      /* Team Dashboard Header & Select */
+      .team-dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.9rem 1rem;
+      }
+      .team-user-selector-wrap {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .dev-profile-select {
+        flex: 1;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+      }
+
+      /* Team Progress Cards 2x2 */
+      .team-progress-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
+        margin-bottom: 1.25rem;
+      }
+      .team-dev-card {
+        padding: 0.85rem;
+        border-radius: var(--radius-sm);
+      }
+      .team-dev-card-top {
+        margin-bottom: 0.5rem;
+      }
+      .team-dev-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+      }
+      .team-dev-name {
+        font-size: 0.82rem;
+      }
+      .team-dev-role {
+        font-size: 0.65rem;
+      }
+      .team-dev-percent {
+        font-size: 0.95rem;
+      }
+      .team-dev-stats {
+        font-size: 0.68rem;
+      }
+
+      /* Filter Chips Horizontal Ribbon */
+      .task-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.4rem;
+        margin-bottom: 1rem;
+        scrollbar-width: none;
+      }
+      .task-filters::-webkit-scrollbar {
+        display: none;
+      }
+      .task-filter-btn {
+        flex-shrink: 0;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.74rem;
+        white-space: nowrap;
+      }
+
+      /* Task Controls Bar */
+      .task-controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+        padding: 0.75rem;
+      }
+      .task-controls-bar > div:last-child {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+      }
+      .task-controls-bar > div:last-child button:last-child {
+        grid-column: span 2;
+      }
+
+      /* Task item on mobile */
+      .task-item {
+        padding: 0.8rem 0.75rem;
+        gap: 0.65rem;
+      }
+      .task-checkbox {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        border-radius: 6px;
+      }
+      .task-text {
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+      .task-actions {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.35rem;
+      }
+      .task-guide-btn {
+        padding: 0.2rem 0.45rem;
+        font-size: 0.65rem;
+      }
+      .task-guide-btn span {
+        display: inline !important;
+      }
+      .task-dev-tag {
+        font-size: 0.58rem;
+        padding: 0.1rem 0.35rem;
+      }
+
+      /* Native Bottom-Sheet Modal */
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+      .modal-card {
+        border-radius: 20px 20px 0 0;
+        max-width: 100% !important;
+        width: 100%;
+        max-height: 88vh;
+        transform: translateY(100%);
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+      }
+      .modal-backdrop.open .modal-card {
+        transform: translateY(0);
+      }
+      .modal-drag-bar {
+        display: block;
+      }
+      .modal-header {
+        padding: 0.75rem 1.25rem 0.85rem;
+      }
+      .modal-title {
+        font-size: 1.05rem;
+      }
+      .modal-body {
+        padding: 1.1rem 1.25rem;
+        gap: 1.1rem;
+      }
+      .modal-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .modal-footer {
+        padding: 0.85rem 1.25rem calc(0.85rem + var(--sab));
+        position: sticky;
+        bottom: 0;
+        background: var(--bg-card);
+        z-index: 10;
+        border-top: 1px solid var(--border-subtle);
+      }
+      .modal-footer > div {
+        width: 100%;
+        display: flex;
+        gap: 0.5rem;
+      }
+      .modal-footer .modal-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.65rem 0.8rem;
+        font-size: 0.78rem;
+      }
+      .modal-footer > button:first-child {
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* Content Grids & Tables */
+      .cards-grid, .team-grid, .pricing-grid, .feature-list {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+      }
+      .arch-flow {
+        padding: 1rem;
+      }
+      .timeline-visual {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .team-progress-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -1393,6 +1723,7 @@
   <!-- ===== MODAL DETALLE DE TAREA ===== -->
   <div class="modal-backdrop" id="taskModalBackdrop" onclick="handleBackdropClick(event)">
     <div class="modal-card" id="taskModalCard">
+      <div class="modal-drag-bar"></div>
       <div class="modal-header">
         <div class="modal-header-left">
           <div class="modal-badges">
@@ -1456,6 +1787,7 @@
   <!-- ===== MODAL CONFIGURACIÓN DE NUBE ===== -->
   <div class="modal-backdrop" id="cloudConfigModalBackdrop" onclick="handleCloudModalBackdropClick(event)">
     <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-drag-bar"></div>
       <div class="modal-header">
         <div>
           <h3 class="modal-title">☁️ Sincronización en la Nube</h3>
@@ -3655,22 +3987,28 @@
       });
     });
 
-    // ===== NAV SCROLL PROGRESS =====
+    // ===== NAV SCROLL PROGRESS & ACTIVE LINK SYNC =====
     window.addEventListener('scroll', () => {
       const scrollTop = window.scrollY;
       const docHeight = document.body.scrollHeight - window.innerHeight;
       const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      document.getElementById('navProgress').style.width = percent + '%';
+      const progressEl = document.getElementById('navProgress');
+      if (progressEl) progressEl.style.width = percent + '%';
 
       // Active nav link
-      const sections = document.querySelectorAll('section[id]');
+      const sections = document.querySelectorAll('section[id], header[id]');
       let current = '';
       sections.forEach(section => {
-        const top = section.offsetTop - 100;
+        const top = section.offsetTop - 120;
         if (scrollTop >= top) current = section.id;
       });
+
       document.querySelectorAll('.nav-links a').forEach(a => {
         a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+
+      document.querySelectorAll('.mobile-nav-item[data-section]').forEach(item => {
+        item.classList.toggle('active', item.dataset.section === current);
       });
     });
 
@@ -3708,7 +4046,7 @@
           if (installBtn) installBtn.style.display = 'none';
         });
       } else {
-        alert('Para instalar Flyvest:\n• En Chrome/Edge: Pulsa el icono ⊕ de instalación en la barra de direcciones.\n• En iOS: Pulsa "Compartir" y luego "Agregar al inicio".');
+        alert('Para instalar Flyvest:\n• En Chrome/Edge/Android: Pulsa el botón "Instalar" o menú (⋮) > "Instalar aplicación".\n• En Safari (iOS): Pulsa "Compartir" (icono cuadrado con flecha) y luego "Agregar a pantalla de inicio".');
       }
     }
 
@@ -3739,5 +4077,29 @@
     renderTasks();
     CloudSync.init();
   </script>
+
+  <!-- ===== MOBILE FLOATING BOTTOM DOCK ===== -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Navegación móvil">
+    <a href="#vision" class="mobile-nav-item active" data-section="vision">
+      <span class="mobile-nav-icon">🚀</span>
+      <span class="mobile-nav-label">Visión</span>
+    </a>
+    <a href="#equipo" class="mobile-nav-item" data-section="equipo">
+      <span class="mobile-nav-icon">👥</span>
+      <span class="mobile-nav-label">Equipo</span>
+    </a>
+    <a href="#arquitectura" class="mobile-nav-item" data-section="arquitectura">
+      <span class="mobile-nav-icon">🏗️</span>
+      <span class="mobile-nav-label">Arqui</span>
+    </a>
+    <a href="#tareas" class="mobile-nav-item" data-section="tareas">
+      <span class="mobile-nav-icon">📋</span>
+      <span class="mobile-nav-label">Tareas</span>
+    </a>
+    <button type="button" class="mobile-nav-item" onclick="openCloudConfigModal()" title="Configuración de nube">
+      <span class="mobile-nav-icon">☁️</span>
+      <span class="mobile-nav-label">Nube</span>
+    </button>
+  </nav>
 </body>
 </html>
