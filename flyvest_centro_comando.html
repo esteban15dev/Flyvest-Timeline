@@ -1249,7 +1249,7 @@
         <div class="dev-emoji">📱</div>
         <div class="dev-name">Cesar</div>
         <div class="dev-alias">Dev 1 — Mobile & Hardware Lead</div>
-        <div class="dev-role">Aplicación móvil offline-first, Google Sign-In, base de datos local y motor de impresión térmica ESC/POS.</div>
+        <div class="dev-role">Aplicación móvil offline-first, Google Sign-In, sincronización de cartera importada, base de datos local y motor de impresión térmica ESC/POS.</div>
         <div class="dev-tech">
           <span class="tech-tag">Flutter</span>
           <span class="tech-tag">Dart</span>
@@ -1262,32 +1262,32 @@
         <div class="dev-emoji">💻</div>
         <div class="dev-name">Angel</div>
         <div class="dev-alias">Dev 2 — Frontend Web & UX Lead</div>
-        <div class="dev-role">Plataforma web, Landing Page, /pricing, Dashboard de dueños, módulo Super-Admin y pasarela Lemon Squeezy.</div>
+        <div class="dev-role">Plataforma web, Onboarding Drag & Drop, mapeo interactivo IA (009), paywalls de conversión, Dashboard y pasarela Lemon Squeezy.</div>
         <div class="dev-tech">
           <span class="tech-tag">Next.js 14/15</span>
           <span class="tech-tag">Tailwind CSS</span>
           <span class="tech-tag">Shadcn UI</span>
           <span class="tech-tag">Lemon Squeezy</span>
-          <span class="tech-tag">Google OAuth</span>
+          <span class="tech-tag">react-dropzone</span>
         </div>
       </div>
       <div class="dev-card" data-dev="3">
         <div class="dev-emoji">🗄️</div>
         <div class="dev-name">Mujica</div>
         <div class="dev-alias">Dev 3 — Backend Core & DB Lead</div>
-        <div class="dev-role">Arquitectura relacional PostgreSQL, Row Level Security, microservicios NestJS, Edge Functions y triggers OAuth.</div>
+        <div class="dev-role">Arquitectura relacional PostgreSQL, Row Level Security, parser de archivos en memoria, detección heurística de PDFs ($0), mapeo semántico Gemini y microservicios NestJS.</div>
         <div class="dev-tech">
           <span class="tech-tag">Supabase</span>
-          <span class="tech-tag">PostgreSQL (RLS)</span>
+          <span class="tech-tag">PostgreSQL (RLS/JSONB)</span>
           <span class="tech-tag">NestJS</span>
-          <span class="tech-tag">Google Cloud/AI</span>
+          <span class="tech-tag">Gemini Flash</span>
         </div>
       </div>
       <div class="dev-card" data-dev="4">
         <div class="dev-emoji">⚙️</div>
         <div class="dev-name">Esteban</div>
         <div class="dev-alias">Dev 4 — DevOps, Concurrency & Workers</div>
-        <div class="dev-role">Microservicios Go de alta concurrencia, algoritmo TSP de rutas, colas Redis/BullMQ, Docker y CI/CD.</div>
+        <div class="dev-role">Microservicios Go de alta concurrencia, algoritmo TSP de rutas, worker BullMQ de importación masiva por chunks, guards de rate limiting en Redis, Docker y CI/CD.</div>
         <div class="dev-tech">
           <span class="tech-tag">Go (Golang)</span>
           <span class="tech-tag">Upstash Redis</span>
@@ -1302,7 +1302,7 @@
   <section class="section" id="features">
     <div class="section-header">
       <div class="section-tag">03 — Features del Producto</div>
-      <h2 class="section-title">8 Features, 1 Plataforma</h2>
+      <h2 class="section-title">9 Features, 1 Plataforma</h2>
       <p class="section-desc">Cada feature tiene su especificación completa con criterios de aceptación, plan de implementación y checklist de tareas.</p>
     </div>
     <div class="feature-list">
@@ -1346,6 +1346,11 @@
         <h4>Monetización con Lemon Squeezy</h4>
         <p>Planes escalonados (Starter/Pro/Enterprise), checkout embebido, webhooks → Supabase, feature gating por plan.</p>
       </div>
+      <div class="feature-item">
+        <div class="feat-code">009</div>
+        <h4>Onboarding Inteligente por Importación</h4>
+        <p>Mapeo asistido por IA (Gemini Flash) para Excel/PDF, ingesta masiva por lotes, control Freemium con Redis y metadatos JSONB.</p>
+      </div>
     </div>
   </section>
 
@@ -1353,8 +1358,8 @@
   <section class="section" id="arquitectura">
     <div class="section-header">
       <div class="section-tag">04 — Arquitectura del Sistema</div>
-      <h2 class="section-title">Flujo de Trabajo Local-First</h2>
-      <p class="section-desc">La clave: el dispositivo móvil es la fuente de verdad durante la operación en ruta. Las limitaciones de los hostings gratuitos se vuelven invisibles.</p>
+      <h2 class="section-title">Flujo de Trabajo Local-First & Motor IA</h2>
+      <p class="section-desc">La clave: el dispositivo móvil es la fuente de verdad en ruta y la IA asiste el onboarding web a costo cero de tokens.</p>
     </div>
     <div class="arch-flow">
       <pre>
@@ -1363,30 +1368,30 @@
 │                                                                      │
 │  Flutter App (Cesar) → SQLite/Isar (Local DB) → ESC/POS (BT/USB)    │
 │       │                                                              │
-│       └── Al detectar conexión → Sincronización CRDT ────────────────┤
+│       └── Al detectar conexión → Sincronización CRDT (002 & 009) ────┤
 └──────────────────────────────────────────┬───────────────────────────┘
                                            │
                                            ▼
 ┌──────────────────────────────────────────────────────────────────────┐
 │  ☁️  SUPABASE (BaaS Central — Mujica)                                │
 │                                                                      │
-│  PostgreSQL (RLS) ←→ Auth (Google OAuth) ←→ Edge Functions           │
+│  PostgreSQL (RLS/JSONB) ←→ Auth (Google OAuth) ←→ Edge Functions     │
 │       │                      │                │                      │
-│       │ Webhooks            │                └──→ Gemini API (IA)    │
-│       ▼                      ▼                                       │
-│  NestJS (Lógica Financiera)  Lemon Squeezy (Pagos)                  │
-│       │                                                              │
-│       └── BullMQ → Upstash Redis → Go Worker (Esteban) ──────────────┤
-│                                      │                               │
-│                                      └──→ Rutas (Feature 005)       │
+│       │ Webhooks            │                └──→ Gemini Flash (IA)  │
+│       ▼                      ▼                           │           │
+│  NestJS (Lógica Financiera)  Lemon Squeezy (Pagos)       │ Mapeo 009 │
+│       │                                                  ▼           │
+│       └── BullMQ (import-batch-queue) → Upstash Redis → Go Worker ───┤
+│                                      │ (Rate Limit)                  │
+│                                      └──→ Rutas (005) & Chunks (009) │
 └──────────────────────────────────────────────────────────────────────┘
                                            │
                                            ▼
 ┌──────────────────────────────────────────────────────────────────────┐
 │  🌐 FRONTEND WEB (Next.js en Vercel — Angel)                         │
 │                                                                      │
-│  Dashboard Dueños (006) ←→ Super-Admin Amplify (007)                 │
-│  Landing Page (/pricing) ←→ Lemon Squeezy Checkout (008)             │
+│  Dashboard Dueños (006) ←→ Onboarding IA / Drag & Drop (009)        │
+│  Landing Page (/pricing) ←→ Paywall Plan Pro & Lemon Squeezy (008)   │
 └──────────────────────────────────────────────────────────────────────┘</pre>
     </div>
   </section>
@@ -1476,6 +1481,19 @@
     </div>
     <div class="pricing-grid">
       <div class="pricing-card">
+        <div class="plan-name">Freemium</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">USD / para siempre</div>
+        <ul class="plan-features">
+          <li>Hasta 20 movimientos / día</li>
+          <li>3 importaciones asistidas IA / día</li>
+          <li>Tablas digitales (Excel, CSV, PDF)</li>
+          <li>1 cobrador en ruta</li>
+          <li>Metadatos JSONB dinámicos</li>
+          <li>$0 costo de entrada</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
         <div class="plan-name">Starter</div>
         <div class="plan-price">$25 <span style="font-size: 0.9rem; color: var(--text-muted);">- $35</span></div>
         <div class="plan-period">USD / mes</div>
@@ -1484,7 +1502,7 @@
           <li>Dashboard básico</li>
           <li>1 local / sucursal</li>
           <li>Chat de IA con límite</li>
-          <li>$0 costo de instalación</li>
+          <li>Importaciones ampliadas</li>
         </ul>
       </div>
       <div class="pricing-card featured">
@@ -1493,10 +1511,10 @@
         <div class="plan-period">USD / mes</div>
         <ul class="plan-features">
           <li>Hasta 5 cobradores en ruta</li>
-          <li>Geolocalización de rutas</li>
-          <li>Reportes avanzados</li>
-          <li>Roles granulares (RBAC)</li>
-          <li>Chat IA sin límite</li>
+          <li>Digitalización OCR Multimodal IA (libretas físicas / PDFs escaneados)</li>
+          <li>Importaciones y movimientos sin límite</li>
+          <li>Geolocalización de rutas (TSP)</li>
+          <li>Reportes avanzados y chat IA sin límite</li>
           <li>Soporte por email</li>
         </ul>
       </div>
@@ -1571,7 +1589,7 @@
             <td>Upstash Redis</td>
             <td>10K cmd/día, 256 MB</td>
             <td><strong>Esteban</strong></td>
-            <td>TTLs agresivos necesarios</td>
+            <td>TTLs agresivos (Guard Freemium: 20 tx/d, 3 imports/d)</td>
           </tr>
           <tr>
             <td><span class="provider-name">Web Admin</span></td>
@@ -3094,6 +3112,195 @@
       "docs/free-tier-optimization.md"
     ],
     "deliverable": "Estrategias de keep-alive y monitoreo de límites del Free Tier implementadas."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Construir componente Drag & Drop de archivos para importación (FileDropzone)",
+    "desc": "Implementar el componente interactivo FileDropzone en Next.js (apps/web) a cargo de Angel para permitir la carga fluida de archivos Excel (.xlsx, .xls), CSV, PDF e imágenes con validaciones inmediatas en cliente.",
+    "steps": [
+      "Instalar y configurar `react-dropzone` en el proyecto web (`apps/web`).",
+      "Crear componente `FileDropzone` con estados visuales: inactivo, arrastre activo (`isDragActive`), procesando y error.",
+      "Validar tipos MIME en el cliente: `.xlsx`, `.xls`, `.csv`, `.pdf`, `.jpg`, `.jpeg`, `.png`.",
+      "Limitar el peso máximo de archivo a 10 MB antes de iniciar la subida y mostrar alertas claras en pantalla.",
+      "Integrar barra de progreso animada durante el envío de las cabeceras y muestras al backend."
+    ],
+    "files": [
+      "apps/web/components/onboarding/file-dropzone.tsx",
+      "apps/web/app/(dashboard)/import/page.tsx",
+      "apps/web/lib/validators/file-upload.ts"
+    ],
+    "deliverable": "Componente Drag & Drop accesible, reactivo y con validaciones estrictas de tamaño y formato."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Diseñar modal interactivo de revisión y confirmación de mapeo (Human-in-the-Loop)",
+    "desc": "Construir la interfaz modal a cargo de Angel donde el usuario revisa la propuesta semántica de Gemini Flash y confirma o corrige el mapeo de columnas (Nombre, Teléfono, Saldo, etc.) antes de la persistencia final.",
+    "steps": [
+      "Crear el componente `MappingReviewModal` con vista previa tabular de las primeras 5 filas detectadas.",
+      "Renderizar selectores desplegables por cada columna detectada para asignar campos de Flyvest (`client_name`, `phone`, `loan_amount`, `balance`, `due_date`, etc.) o 'Guardar como metadato adicional'.",
+      "Mostrar indicador de confianza (%) devuelto por el motor semántico para guiar al usuario.",
+      "Permitir al usuario ignorar columnas no deseadas o corregir tipos de datos con feedback visual inmediato.",
+      "Implementar botón de confirmación 'Proceder con la importación' que despacha el payload mapeado a la cola de BullMQ."
+    ],
+    "files": [
+      "apps/web/components/onboarding/mapping-review-modal.tsx",
+      "apps/web/components/onboarding/column-mapper-row.tsx",
+      "apps/web/hooks/use-import-mapping.ts"
+    ],
+    "deliverable": "Modal interactivo de correspondencia de campos que garantiza el principio Human-in-the-Loop."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 2,
+    "dev_name": "Angel",
+    "text": "Diseñar modal de paywall persuasivo hacia el Plan Pro ($49/mes) para documentos escaneados",
+    "desc": "Construir modal de conversión a cargo de Angel hacia el Plan Pro cuando el usuario intente digitalizar fotos de libretas de cobro manuales o PDFs escaneados dentro de la capa Freemium.",
+    "steps": [
+      "Crear componente `ScanPaywallModal` con diseño persuasivo destacando los beneficios del Plan Pro ($49/mes).",
+      "Mostrar comparativa visual: 'Digitalización OCR Multimodal con Visión IA para cuadernos físicos y escaneos' vs. 'Tablas digitales planas en Freemium'.",
+      "Integrar botón de Call To Action 'Desbloquear con Plan Pro' conectado directamente al checkout de Lemon Squeezy.",
+      "Añadir opción secundaria 'Continuar con archivo Excel/CSV plano' para no bloquear la experiencia del usuario gratuito.",
+      "Registrar métrica de telemetría de visualización e intención de upgrade hacia el Super-Admin."
+    ],
+    "files": [
+      "apps/web/components/onboarding/scan-paywall-modal.tsx",
+      "apps/web/components/pricing/plan-comparison-card.tsx",
+      "apps/web/lib/telemetry/paywall-events.ts"
+    ],
+    "deliverable": "Modal de paywall persuasivo y optimizado para conversión a suscripciones de pago Pro."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Crear FileParserService en NestJS con parser en memoria y detección de PDFs escaneados ($0)",
+    "desc": "Implementar servicio de extracción local en memoria en NestJS a cargo de Mujica para extraer cabeceras y 3-5 filas de muestra, e incorporar detector heurístico de PDFs escaneados a costo $0 por densidad textual.",
+    "steps": [
+      "Crear servicio `FileParserService` en `services/core` utilizando librerías en memoria (`xlsx` / `exceljs`, `csv-parser`, `pdf-parse`).",
+      "Extraer únicamente la fila de encabezados y un subconjunto de 3 a 5 filas de muestra para optimizar el consumo de memoria (<10MB).",
+      "Implementar algoritmo heurístico de costo $0 para detección de PDFs escaneados: medir la densidad de caracteres de texto extraíbles por página; si es inferior al umbral mínimo, clasificar como escaneado/imagen.",
+      "Retornar bandera `isScanned: boolean` para activar el flujo de paywall Pro en el frontend si el tenant se encuentra en plan Freemium.",
+      "Implementar pruebas unitarias con archivos de prueba reales (Excel nativo, CSV UTF-8 y PDFs vectoriales vs escaneados)."
+    ],
+    "files": [
+      "services/core/src/modules/import/file-parser.service.ts",
+      "services/core/src/modules/import/scanned-pdf-detector.ts",
+      "services/core/test/file-parser.spec.ts"
+    ],
+    "deliverable": "Servicio de parsing ultra liviano con detección de PDFs escaneados a costo $0 por densidad de texto."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Integrar mapeo semántico de columnas con Gemini Flash y Structured Outputs (response_schema)",
+    "desc": "Conectar el servicio de análisis a cargo de Mujica con Google AI Studio usando Gemini Flash y esquemas JSON estrictos (`response_schema`) para emparejar columnas legacy con entidades Flyvest con consumo menor a 800 tokens.",
+    "steps": [
+      "Configurar cliente del SDK `@google/genai` o llamada REST a Google AI Studio con modelo `gemini-1.5-flash`.",
+      "Definir el `response_schema` en formato JSON Schema estricto que obligue a Gemini a responder con la estructura exacta: `{ mappings: [{ originalColumn, targetEntity, targetField, confidence }] }`.",
+      "Diseñar System Prompt especializado en terminología financiera y de cobranza informal latinoamericana (e.g. 'cuota', 'abono diario', 'saldo pendiente', 'libreta', 'alias').",
+      "Enviar únicamente los nombres de cabeceras y 3 filas de muestra anonimizadas, garantizando un consumo menor a 800 tokens ($0 costo).",
+      "Implementar fallback heurístico basado en similitud de Levenshtein / Jaro-Winkler si el servicio de IA no responde en menos de 3 segundos."
+    ],
+    "files": [
+      "services/core/src/modules/import/gemini-mapping.service.ts",
+      "services/core/src/modules/import/dto/mapping-response.schema.ts",
+      "services/core/src/modules/import/prompts/column-mapping.prompt.ts"
+    ],
+    "deliverable": "Endpoint de inferencia semántica con salida estructurada JSON garantizada y costo mínimo de tokens."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 3,
+    "dev_name": "Mujica",
+    "text": "Diseñar ingesta transaccional con metadatos dinámicos en columnas JSONB de PostgreSQL",
+    "desc": "Configurar la persistencia de datos importados a cargo de Mujica almacenando atributos estándar en columnas fijas y empaquetando atributos legacy adicionales dentro de campos `metadata JSONB` sin alterar el esquema.",
+    "steps": [
+      "Añadir columna `metadata JSONB DEFAULT '{}'::jsonb` con índice GIN en las tablas `clients` y `loans` mediante migración de Supabase.",
+      "Crear procedimiento de inserción transaccional (`INSERT INTO ...`) que mapee campos estándar (identificación, nombre, teléfono, balance) a columnas dedicadas.",
+      "Empaquetar dinámicamente cualquier columna legacy no mapeada directamente (e.g. 'número de libreta anterior', 'apodo del fiador', 'referencia barrial') dentro del objeto `metadata`.",
+      "Asegurar el aislamiento multi-tenant aplicando `tenant_id` obligatorio y validando permisos RLS antes de la inserción.",
+      "Crear triggers de auditoría para registrar el origen de la importación (`source: 'ai_file_import'`, nombre del archivo y usuario creador)."
+    ],
+    "files": [
+      "supabase/migrations/20260109000000_import_metadata_jsonb.sql",
+      "services/core/src/modules/import/transactional-importer.service.ts",
+      "services/core/src/modules/clients/entities/client.entity.ts"
+    ],
+    "deliverable": "Esquema y repositorio con soporte de metadatos flexibles en JSONB indexados por GIN."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Implementar Guard de Rate Limiting en Upstash Redis para la capa Freemium",
+    "desc": "Configurar control de cuotas diario con Redis a cargo de Esteban aplicando un TTL rotativo de 24h para limitar a 20 movimientos/día y 3 importaciones con IA/día por cada tenant en plan gratuito.",
+    "steps": [
+      "Diseñar estructura de llaves en Upstash Redis: `ratelimit:freemium:{tenantId}:tx:{YYYY-MM-DD}` y `ratelimit:freemium:{tenantId}:ai_import:{YYYY-MM-DD}` con TTL automático de 86,400 segundos (24 horas).",
+      "Implementar script atómico en Lua / comandos `INCR` + `EXPIRE` para evitar condiciones de carrera en ráfagas concurrentes.",
+      "Crear middleware / Guard `FreemiumQuotaGuard` que verifique el plan del tenant (`plan_tier === 'freemium'`); si excede 20 tx o 3 importaciones, retornar `429 Too Many Requests` con cabeceras `Retry-After` y mensaje informativo.",
+      "Si el tenant posee plan Starter, Pro o Enterprise, omitir el rate limiting de importaciones y permitir volumen ampliado.",
+      "Añadir métricas en el dashboard de monitoreo de Redis para observar el consumo de cuotas sin saturar el límite de 10K comandos diarios del Free Tier."
+    ],
+    "files": [
+      "services/core/src/common/guards/freemium-quota.guard.ts",
+      "services/core/src/common/redis/rate-limiter.service.ts",
+      "tests/load/freemium-rate-limit.spec.ts"
+    ],
+    "deliverable": "Sistema de Rate Limiting blindado en Redis con TTL de 24h para protección del Free Tier."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 4,
+    "dev_name": "Esteban",
+    "text": "Construir Worker de Importación Masiva por Chunks en BullMQ (cola 'import-batch-queue')",
+    "desc": "Desarrollar el procesador en segundo plano a cargo de Esteban para procesar archivos masivos en lotes de 100-200 filas, previniendo saturación de memoria y tiempos límite de ejecución en servidores.",
+    "steps": [
+      "Configurar la cola asíncrona `import-batch-queue` en BullMQ respaldada por Upstash Redis.",
+      "Dividir el dataset mapeado y validado en chunks homogéneos de 100 a 200 filas para procesamiento por lotes.",
+      "Implementar inserción transaccional por lotes (`pg-promise` / bulk insert) con manejo de errores fila por fila para no abortar todo el lote por una inconsistencia menor.",
+      "Publicar eventos de progreso (`job.progress(percent)`) hacia Supabase Realtime / WebSockets para actualizar la barra de progreso en el navegador del usuario.",
+      "Configurar reintentos exponenciales (backoff: 3 intentos) y Dead Letter Queue (DLQ) para registrar filas que fallaron con sus motivos de rechazo."
+    ],
+    "files": [
+      "services/worker/src/processors/import-batch.processor.ts",
+      "services/worker/src/queues/import-queue.config.ts",
+      "services/worker/test/import-worker.spec.ts"
+    ],
+    "deliverable": "Worker asíncrono resiliente para carga masiva por chunks con reporte de progreso en tiempo real."
+  },
+  {
+    "phase": "Fase 3 — Hardware, Rutas & Integración (Sem 6-8)",
+    "feature": "009",
+    "dev": 1,
+    "dev_name": "Cesar",
+    "text": "Sincronización inmediata de cartera importada en la App Móvil (SQLite/Isar)",
+    "desc": "Añadir soporte en el motor de sincronización de Flutter a cargo de Cesar para que al iniciar la jornada o presionar 'Sincronizar', el cobrador descargue automáticamente los clientes y créditos recién importados.",
+    "steps": [
+      "Extender el protocolo de pull de datos en `SyncRepository` para detectar entidades con bandera `source: 'ai_file_import'` y nuevos registros generados en la nube.",
+      "Actualizar el esquema de Isar / SQLite en Flutter incorporando el campo dinámico `metadata` serializado en formato JSON string o mapa local.",
+      "Manejar la descarga eficiente por paginación o deltas incrementales basados en `updated_at` / Vector Clocks para no sobrecargar el almacenamiento del móvil.",
+      "Actualizar la vista de lista de clientes y cálculo de rutas del cobrador mostrando una notificación visual: '✨ Cartera importada actualizada con X nuevos clientes'.",
+      "Verificar que los créditos importados puedan cobrarse y registrar pagos offline inmediatamente sin requerir conexión a internet."
+    ],
+    "files": [
+      "lib/features/sync/data/repositories/sync_repository_impl.dart",
+      "lib/features/clients/data/models/client_model.dart",
+      "lib/features/clients/presentation/widgets/client_list_tile.dart"
+    ],
+    "deliverable": "Mecanismo de sincronización delta que integra instantáneamente la cartera importada en la base de datos móvil offline."
   },
   {
     "phase": "QA & Preparación de Lanzamiento",

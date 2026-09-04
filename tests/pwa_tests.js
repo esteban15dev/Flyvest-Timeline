@@ -174,6 +174,43 @@ test('Fusión en la nube: resolución correcta de conflictos por marca de tiempo
   assert.strictEqual(localStates[2].completed, true, 'Tarea 2 de Angel debe agregarse');
 });
 
+// 7. Validar integración de Feature 009 y asignación por desarrollador
+test('Feature 009 (Onboarding Inteligente) está integrada en el timeline con tareas para todo el equipo', () => {
+  const htmlPath = path.join(ROOT_DIR, 'index.html');
+  const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+  
+  const match = htmlContent.match(/const TASKS = (\[[\s\S]*?\]);/);
+  assert.ok(match, 'No se pudo extraer el arreglo TASKS de index.html');
+  
+  const tasks = eval(match[1]);
+  const f009Tasks = tasks.filter(t => t.feature === '009');
+  
+  assert.strictEqual(f009Tasks.length, 9, 'Feature 009 debe tener exactamente 9 tareas');
+
+  const cesarTasks = f009Tasks.filter(t => t.dev === 1 && t.dev_name === 'Cesar');
+  const angelTasks = f009Tasks.filter(t => t.dev === 2 && t.dev_name === 'Angel');
+  const mujicaTasks = f009Tasks.filter(t => t.dev === 3 && t.dev_name === 'Mujica');
+  const estebanTasks = f009Tasks.filter(t => t.dev === 4 && t.dev_name === 'Esteban');
+
+  assert.strictEqual(cesarTasks.length, 1, 'Cesar debe tener 1 tarea asignada para Feature 009');
+  assert.strictEqual(angelTasks.length, 3, 'Angel debe tener 3 tareas asignadas para Feature 009');
+  assert.strictEqual(mujicaTasks.length, 3, 'Mujica debe tener 3 tareas asignadas para Feature 009');
+  assert.strictEqual(estebanTasks.length, 2, 'Esteban debe tener 2 tareas asignadas para Feature 009');
+
+  // Validar presencia de campos requeridos y entregable
+  f009Tasks.forEach(task => {
+    assert.ok(task.text && task.text.length > 0, 'La tarea debe tener título');
+    assert.ok(task.desc && task.desc.length > 0, 'La tarea debe tener descripción');
+    assert.ok(Array.isArray(task.steps) && task.steps.length >= 4, 'La tarea debe tener al menos 4 pasos detallados');
+    assert.ok(Array.isArray(task.files) && task.files.length >= 1, 'La tarea debe tener archivos especificados');
+    assert.ok(task.deliverable && task.deliverable.length > 0, 'La tarea debe tener entregable');
+  });
+
+  // Validar presencia en la sección de features del HTML
+  assert.ok(htmlContent.includes('Onboarding Inteligente'), 'Falta tarjeta de Feature 009 en lista de features');
+  assert.ok(htmlContent.includes('Freemium'), 'Falta capa Freemium en la sección de precios');
+});
+
 console.log(`\n================================`);
 console.log(`Resultados: ${passedTests}/${totalTests} pruebas exitosas.`);
 console.log(`================================\n`);
